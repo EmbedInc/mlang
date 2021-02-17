@@ -128,6 +128,9 @@ done_opts:                             {done with all the command line options}
     stat);
   sys_error_abort (stat, '', '', nil, 0);
 
+  escr_quotesyn_clear (e_p^);          {clear existing quoted string syntaxes}
+  escr_quotesyn_add (e_p^, '"', '"');  {quoted strings start/end with quote chars}
+
   string_vstring (e_p^.syfunc.st, '{', 1); {set function start/end identification}
   string_vstring (e_p^.syfunc.en, '}', 1);
 
