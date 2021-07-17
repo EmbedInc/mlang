@@ -1,0 +1,293 @@
+<html lang="en-US">
+<head>
+  <link rel="stylesheet" href="../../../document.css"></link>
+  <link rel="stylesheet" href="../../document.css"></link>
+  <link rel="stylesheet" href="../document.css"></link>
+  <link rel="stylesheet" href="document.css"></link>
+  <title>M Language</title>
+  </head>
+<body>
+
+<h1 class=page>The M Computer Language
+  <br>Memory Model</h1>
+<p class=page>Last updated 17 July 2021</p>
+
+
+<p>The M model of the underlying machine's memory architecture consists of
+<i>memories</i>, and <i>address spaces</i>.&nbsp;  These are further
+broken into <i>memory regions</i> and <i>address regions</i>, which can
+have various attributes associated with them.&nbsp;
+
+<p>All memory items, such as variables and executable code, exist in a
+specific memory region.&nbsp;  The memory architecture definition is
+therefore generally the first thing in a M program.&nbsp;  In practise, it
+is expected this is done by referencing a pre-defined include file for the
+particular target machine.&nbsp;
+
+<p>Memories, address spaces, and their regions are:</p><indent>
+
+  <h4>Memory</h4><indent>
+
+    <p>A memory is a physical memory accessible to the processor.&nbsp;
+    This refers to the memory itself, not how it might be accessed.&nbsp;
+    The entire memory has some attributes, such as the number of address
+    bits, and the word size.&nbsp;
+
+    <p>In a typical Von Neuman machine, for example, there would be a
+    single large memory.&nbsp;  A harvard architecture machine would have
+    at least two memories, one for data and one for the executable
+    program.&nbsp;  Some microcontrollers would have additional memories,
+    such as internal EEPROM.&nbsp;  Whenever the number of address bits or
+    the number of bits at each address differ, different memories must be
+    defined.&nbsp;
+
+    </p></indent>
+
+  <h4>Memory region</h4><indent>
+
+    <p>Memories are further broken down into named regions.&nbsp; Anything
+    that is allocated or defined to be in memory is done so with reference
+    to a particular memory region.&nbsp;  Different memory regions can
+    have different attributes, such as readable, writeable, and
+    executable.&nbsp; The main reasons for defining multiple regions
+    within a memory is to be able to give each different attributes, and
+    to reflect physically segmented memories.&nbsp;  At least one memory
+    region must be defined in a memory for the memory to have any
+    use.&nbsp;
+
+    </p></indent>
+
+  <h4>Address Space</h4><indent>
+
+    <p>Address spaces indicate the various views the processor has to the
+    physical memories.&nbsp; A memory defines <i>what</i> is out there,
+    and a address space <i>how</i> it is accessed.&nbsp;  Multiple address
+    spaces may map to the same physical memory, since that is possible in
+    real processors.&nbsp;  Another way of describing a address space is
+    the processor view of a memory.&nbsp;
+
+    </p></indent>
+
+  <h4>Address region</h4><indent>
+
+    <p>Address spaces are further broken into address regions, each of
+    which can have its own sets of attributes.&nbsp;
+
+    <p>This mechanism supports segmented architectures where a whole
+    memory is not directly addressable.&nbsp;  A segment is usually a
+    smaller view of a memory with a narrower address than the full
+    memory.&nbsp;  This addressable segment can be mapped to different
+    regions of the memory by changing some state at runtime.&nbsp; M
+    allows such remappable windows to be described, including some
+    information about the state that defines the current mapping from
+    address space to actual memory.&nbsp;
+
+    </p></indent>
+
+  </p></indent>
+
+<p>The statements for defining the memory model are:
+
+<h2 id="memory statement"><tt><b>memory</b> <i>name</i> <i>parameter</i>
+... <i>parameter</i></tt></h2><indent>
+
+  <p>The <tt><b>memory</b></tt> statement defines one physical memory
+  available to the processor.&nbsp;  It defines the characteristics of the
+  memory itself, not how it is accessed or mapped into the processor's
+  address space (that is done with the <tt><b>address</b></tt>
+  statement).&nbsp;
+
+  <p>This statement defines the symbol <tt><i>name</i></tt> to refer to
+  the memory space.&nbsp;  The parameters that may follow the
+  <tt><b>memory</b></tt> statement are:
+
+  <p><tt><b>adrbits</b> <i>nbits</i></tt></p><indent>
+
+    <p>Specifies the number of address bits.&nbsp;  This is the number of
+    bits required by the memory hardware, and must be at least enough to
+    uniquely identify each memory word.&nbsp;  <tt><i>Nbits</i></tt> must
+    be a positive integer.&nbsp;  There is no default.&nbsp;  A
+    <tt><b>adrbits</b></tt> parameter is required.&nbsp;
+
+    </p></indent>
+
+  <p><tt><b>datbits</b> <i>nbits</i></tt></p><indent>
+
+    <p>Specifies the number of bits in each individually addressed
+    word.&nbsp;  <tt><i>Nbits</i></tt> must be a positive integer.&nbsp;
+    This parameter is required.&nbsp;
+
+    </p></indent>
+
+  <p><tt><b>access</b> [-]<i>accesstype</i></tt></p><indent>
+
+    <p>Specifies one kind of access that the processor has to this memory
+    available to a program at run time.&nbsp;  Without the optional "-"
+    before <tt><i>accesstype</i></tt>, the access type is indicated to be
+    available to the processor.&nbsp;  With the "-", the access type is
+    indicated to not be available to the processor.&nbsp;  Access types
+    not mentioned in any <tt><b>access</b></tt> parameter inherit the
+    default setting.&nbsp;  At the top level, the default for all access
+    types is that they are not available.&nbsp;  This means that any
+    access that a memory supports must be explicitly mentioned in the
+    source code at least once for that memory.&nbsp;
+
+    <p>The <tt><i>accesstype</i></tt> keywords are:</p><indent>
+
+      <p><tt><b>read</b></tt></p><indent>
+
+        <p>The value of the words of this memory can be determined and
+        used as data in the program.&nbsp;
+
+        </p></indent>
+
+      <p><tt><b>write</b></tt></p><indent>
+
+        <p>The program can alter the data stored in the memory.&nbsp;
+
+        </p></indent>
+
+      <p><tt><b>execute</b></tt></p><indent>
+
+        <p>The processor can fetch the value of words of this memory,
+        interpret them as instructions, and natively perform their
+        specified operation.&nbsp;  This access type applies if the
+        processor itself can perform instructions stored in this
+        memory.&nbsp; <tt><b>Execute</b></tt> access does not apply, for
+        example, if the program reads the instructions and performs
+        their operations in software, such as a interpreter might
+        do.&nbsp;
+
+        </p></indent>
+
+      </p></indent>
+
+    <p>There may be any number of <tt><b>access</b></tt> parameters.&nbsp;
+    Later <tt><b>access</b></tt> parameters override earlier ones in case
+    of conflict.&nbsp;
+
+    </p></indent>
+
+  </p></indent>
+
+
+<h2 id="memregion statement"><tt><b>memregion</b> <i>name</i> <b>in</b>
+<i>memory</i> <i>parameter</i> ... <i>parameter</i></tt></h2><indent>
+
+  <p>Defines a named region within a memory.&nbsp; <tt><i>Name</i></tt> is
+  the symbol being defined by this statement, which will refer to the
+  memory region.&nbsp; <tt><i>Memory</i></tt> is the name of a memory
+  region as defined by a previous <tt><b>memory</b></tt> statement.&nbsp;
+
+  <p>Variables and other memory-resident objects are later defined to be
+  in a memory region.&nbsp;  Linkers can only place such objects in memory
+  regions.  A memory that has no memory region defined within it can not
+  have objects placed into it by a linker.&nbsp;
+
+  <p>Address regions are defined later with reference to a memory
+  region.&nbsp;  A memory with no memory region defined within it can have
+  no address regions reference it, which means there is no known (to the
+  compiler) access to the memory from the program.&nbsp;  A memory with no
+  memory region is therefore pointless, and the compiler will issue a
+  warning that the memory is unused.&nbsp;
+
+  <p>The parameters of this statement may be:
+
+  <p><tt><b>startadr</b> <i>address</i></tt></p><indent>
+
+    <p>Specifies the starting address of the memory region within the
+    memory.&nbsp;  <tt><i>Address</i></tt> must be a valid address within
+    the memory.&nbsp;
+
+    </p></indent>
+
+  <p><tt><b>length</b> <i>size</i></tt></p><indent>
+
+    <p>Specifies the size of this memory region.&nbsp;
+    <tt><i>Size</i></tt> is in units of address increments within the
+    parent memory.&nbsp;  All addresses from the start address of this
+    memory region to the start address plus <tt><i>size</i></tt> minus 1
+    must be valid addresses within the memory.&nbsp;
+
+    <p>The region size can also be implied by the <tt><b>endadr</b></tt>
+    parameter (described below).&nbsp;  If both are present, they must
+    define the same region size.&nbsp;
+
+    </p></indent>
+
+  <p><tt><b>endadr</b> <i>address</i></tt></p><indent>
+
+    <p>Specifies the last address of the memory region within the parent
+    memory.&nbsp;  All addresses from the start address to
+    <tt><i>address</i></tt> must be valid addresses within the parent
+    memory.&nbsp;
+
+    <p>The region end address can also be implied by the
+    <tt><b>length</b></tt> parameter (described above).&nbsp;  If both are
+    present, they must define the same region end address.&nbsp;
+
+    </p></indent>
+
+  <p><tt><b>access</b> [-]<i>accesstype</i></tt></p><indent>
+
+    <p>This is the same as the <tt><b>access</b></tt> parameter to the
+    <tt><b>memory</b></tt> statement.&nbsp;  However, the access to a
+    memory region can never be less restrictive than that of the parent
+    memory as a whole.&nbsp;  Put another way, access types available in
+    the parent memory may be disabled for the memory region, but a access
+    type disabled in the parent memory can not be enabled for a memory
+    region.&nbsp;  The default access types of a memory region are those
+    of its parent memory.&nbsp;
+
+    </p></indent>
+
+  </p></indent>
+
+
+<h2 id="address statement"><tt><b>address</b> <i>name</i> <i>parameter</i>
+... <i>parameter</i></tt></h2><indent>
+
+  <p>Defines one logical address space.&nbsp;  The symbol
+  <tt><i>name</i></tt> is defined to refer to this address space.&nbsp;
+
+  <p>The possible parameters to the <tt><b>address</b></tt> statement are:
+
+  <p><tt><b>adrbits</b> <i>nbits</i></tt>
+
+  <p><tt><b>datbits</b> <i>nbits</i></tt>
+
+  <p><tt><b>access</b> <b>[-]</b><i>accesstype</i></tt>
+
+  <p><tt><b>state</b> <i>name</i> <i>description</i></tt>
+
+  </p></indent>
+
+
+<h2 id="adrregion statement"><tt><b>adrregion</b> <i>name</i> <b>in</b>
+<i>adrspace</i> <b>to</b> <i>memregion</i> <i>parameter</i> ...
+<i>parameter</i></tt></h2><indent>
+
+  <p>Defines <tt><i>name</i></tt> as the symbol to represent a particular
+  program-visible window to the portion of a physical memory defined by
+  <tt><i>memregion</i></tt> within the address space
+  <tt><i>adrspace</i></tt>.&nbsp;  <tt><i>Adrspace</i></tt> and
+  <tt><i>memregion</i></tt> must have been previously defined.&nbsp;
+
+  <p>The possible parameters to the <tt><b>adrregion</b></tt> statement
+  are:
+
+  <p><tt><b>depends</b> <i>statename</i> <i>value</i></tt>
+
+  </p></indent>
+
+
+<hr><!-- ---------------------------------------------------------------------->
+
+<ul>
+  <li><a rel="next" href="types.htm">Next chapter</a>
+  <li><a rel="prev" href="syntax.htm">Previous chapter</a>
+  <li><a rel="contents" href="index.htm#contents">Table of Contents</a>
+  <li><a rel="start" href="index.htm">First page</a>
+  </ul>
+
+</body></html>

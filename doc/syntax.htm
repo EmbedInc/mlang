@@ -1,0 +1,382 @@
+<html lang="en-US">
+<head>
+  <link rel="stylesheet" href="../../../document.css"></link>
+  <link rel="stylesheet" href="../../document.css"></link>
+  <link rel="stylesheet" href="../document.css"></link>
+  <link rel="stylesheet" href="document.css"></link>
+  <title>M Language</title>
+  </head>
+<body>
+
+<h1 class=page>The M Computer Language
+  <br>Basic Syntax</h1>
+<p class=page>Last updated 7 January 2012</p>
+
+<p>This chapter introduces the basic syntax rules of M.
+
+<h2 id="character set">Character Set</h2><indent>
+
+  <p>M source is a sequence of characters organized into lines of
+  text.&nbsp; All characters must be the space character, denote end of a
+  line, or be "printable" (result in a visible mark when displayed
+  normally).&nbsp;  Note that this specifically excludes non-printable
+  characters commonly refered to as "control characters".&nbsp;
+
+  <p>Different operating systems use different conventions for denoting
+  the end of a text line in a file.&nbsp;  While catering to every wierd
+  implementation out there is impossible, the vast majority of
+  implementations are easily covered.&nbsp;  Generally, systems use either
+  carriage return (code 13, "CR"), linefeed (code 10, "LF"), or a carriage
+  return and line feed pair.&nbsp;  M will interpret the first occurance
+  of CR or LF as a new line.&nbsp;  If that is then followed by the other
+  of CR or LF, this second character is ignored.&nbsp;  Therefore CR, LF,
+  CRLF and LFCR all denote the end of a single line.&nbsp;  Additional end
+  of lines are interpreted as additional CR, LF, CRLF, or LFCR sequences
+  are encountered.&nbsp;
+
+  <p>Since TAB (code 9) is a control character, it is not allowed in M
+  source.&nbsp; This is a deliberate design choice.&nbsp;  There is no
+  standard interpretation of the TAB character.&nbsp;  Text with tabs can
+  look quite different on different systems, and even as displayed by
+  different applications on the same system.&nbsp; Leaving tabs in source
+  code has been a dumb idea for a long time, but unfortunately is still
+  done too often.&nbsp;  M enforces this rule when common sense alone is
+  not sufficient.&nbsp;  While using the TAB key to quickly move the
+  cursor horizontally is a useful and legitimate feature of text editors,
+  there is no excuse for this to leave TAB characters in the file.&nbsp;
+
+  <p>Specifically, M only interprets the characters 10 (linefeed), 13
+  (carriage return), space (32), and the printable characters
+  33-126.&nbsp; These are the only characters required to write M
+  code.&nbsp;  Character 127 (sometimes referred to a "rub out") is
+  considered a control character and is not allowed.&nbsp;  The remaining
+  characters 128-255 can not be counted on to have standard
+  meanings.&nbsp;  M will only pass them thru in cases they are not
+  interpreted by the compiler, such as in comments.&nbsp; These characters
+  are not allowed in other cases.&nbsp;
+
+  <p>It is tempting to allow additional characters in certain instances,
+  like in comments or possibly even in string constants.&nbsp;  It would
+  be nice, for example, to allow someone in Germany to write comments
+  using the Ess-zet (&szlig;) or letters with umlauts (&auml;, &Ouml;,
+  etc).&nbsp;  If a programmer can write comments more naturally, he will
+  probably write more and better comments.&nbsp; That is a Good
+  Thing.&nbsp;
+
+  <p>However, there is a downside to consider.&nbsp; It conflicts with the
+  goal of any programmer being able to maintain code written by any
+  other.&nbsp; How would someone with a standard US keyboard, for example,
+  easily edit the code?&nbsp;  Maybe that's not so bad in comments, since
+  the maintainer would likely write his own comments, but what if this
+  were allowed in symbol names?&nbsp; If a variable was defined with a
+  umlaut in its name and used frequently, that could be a real burden on
+  someone with a keyboard that makes typing umlaut letters
+  difficult.&nbsp;
+
+  <p>So what's the best answer?&nbsp;  I'm not sure, but I think the
+  advantage of letting someone write comments with a wide choice of
+  characters outweighs the downside.&nbsp;  However, for symbols I believe
+  the downside is too significant.&nbsp;  The issue with string constants
+  can be addressed with a good escape sequence mechanism.&nbsp;
+  Programmers in one location often have to write code that will be used
+  in different locations where different characters are used in the
+  natural language.&nbsp;  M has to support being able to write arbitrary
+  strings regardless of how restrictive it is with its own character
+  set.&nbsp;
+
+  <p>Early implementations of M should err on the side of being too
+  restrictive.&nbsp; It will be easier to relax the rules later than to
+  tighten them because the former won't make some existing valid code
+  suddenly invalid.&nbsp;
+
+  </p></indent>
+
+
+<h2 id="comments">Comments</h2><indent>
+
+  <p>Comments are text for the human programmer only, and are specifically
+  defined to have no semantic meaning in the M language.&nbsp;
+
+  <p>There can be at most one comment per line.&nbsp;  Once a comment is
+  started, the entire remainder of the line is part of that comment.&nbsp;
+
+  <p>The apostrophy character ('), character code 39, starts a end of line
+  comment unless it is in a quoted string.&nbsp;  The only two uses for
+  the apostrophy character are as a character in a literal string, and to
+  indicate start of comment.&nbsp;  For the purpose of semantically
+  processing the source stream, the comment start character and all
+  characters following it up to the end of line are discarded.&nbsp;
+  Then, any blank characters at the end of the line are also
+  discarded.&nbsp;
+
+  <p>Empty lines are also ignored semantically.&nbsp;  Note that a empty
+  line results from any line that is either all blank or where the only
+  printable characters are a comment.&nbsp;
+
+  <p>In the remainder of the M language definition, unless explicitly
+  stated   otherwise, syntax is defined for the result after comments,
+  trailing blanks, and blank lines have been stripped as discussed
+  above.&nbsp;  A comment is allowed anywhere a space would be allowed,
+  but this will not usually be explicitly mentioned in syntax
+  descriptions.&nbsp;
+
+  <h3 id="comments-tagging">Comment Tagging</h2><indent>
+
+    <p>Comments have no meaning to the language, but they do (at least
+    should) have meaning to the human programmer.&nbsp;  It may therefore
+    be useful for software intended to aid programmers to display comments
+    in a meaningful way in the right context.&nbsp;  M therefore has rules
+    about what point in the code or section of code a comment applies to
+    or "tags".&nbsp;
+
+    <p>For the purpose of determining comment tagging, comments are
+    classfied into one of three catagories:<ol>
+
+      <li>Comment line.&nbsp;  This is a line containing only a
+      comment.&nbsp; in other words, the comment start character (') is
+      the first non-space character on the line, and a comment start
+      character is present.&nbsp;
+
+      <li>End of line comment.&nbsp;  A comment following other
+      non-comment and non-space characters on the same line.&nbsp;
+
+      <li>Blank line.&nbsp;  This is a line containing only zero or more
+      blank characters (no comment start character).&nbsp;
+
+      </ol>
+
+    <p>A comment block is a contiguous set of only comment lines, all at
+    the same indentation level.&nbsp;  In other words, all the comment
+    start characters must be in the same column, and each line in the
+    block must have a comment start character with only zero or more
+    blanks preceeding it.&nbsp;  Note that this does not require any
+    characters to follow the comment start character.&nbsp;  It is
+    permissiable for the comment start character to be the last character
+    on the line, or be followed only by blanks.&nbsp;
+
+    <p>A comment block can either tag a specific section of code or be
+    "floating" (not tag any code).&nbsp;
+
+    <p>A comment block ended by a blank line is floating.&nbsp;  It is
+    associated with the location it is found in the source code, but does
+    not specifically tag a section of code.&nbsp;  Such comments may be
+    used, for example, for higher level discussion, description of data
+    fomats, etc, that do not specifically apply to the immediately
+    following code.&nbsp; Floating block comments must start in column
+    1.&nbsp;
+
+    <p>A block comment not immediately followed by a blank line tags the
+    following section of code.&nbsp;  The comment must be at the same
+    indentation (start in the same column) as the start of the following
+    code.&nbsp;  This block comment applies to the whole section of code
+    at that nesting level and lower.&nbsp;  The comment stops applying to
+    the first code at a higher nesting level.&nbsp;  Such comments should
+    describe something relating to the section of code they tag.&nbsp;
+
+    <p>End of line comments tag the point of code at the start of their
+    line.&nbsp;  They may actually describe something pertaining to
+    multiple parts of the line, but for the purpose of association with
+    the source code they tag only the start of the line.&nbsp; For
+    example, if code was reformatted by a automated process that broke
+    long lines into multiple shorter lines, the end of line comments would
+    be written on whatever lines the point they tagged ended up on.&nbsp;
+
+    <p>The following example illustrates the rules described above:&nbsp;
+
+    <pre>
+'   Block 1.  This is a floating comment.  It does not apply to any specific
+'   point or section of code since it is followed by a blank line.
+
+  '   Block 2.  This comment block applies to the whole section of following
+  '   code, which is the FOOBLOCK - MORESTUFF statements since these are all at
+  '   the same or higher indentation level as this comment.
+  '
+  <b>fooblock</b> 27                           'applies to start of fooblock statement
+    '
+    '   Block 3.  This tags the BAR - DOSTUFF statements.
+    '
+    <b>bar</b> 39 "stuff"                      'applies to start of bar statement
+    <b>blork</b>
+    <b>dostuff n</b> 39 <b>name</b> "Arf"
+  <b>morestuff</b>
+<b>outerstuff</b>                              'first statement not tagged by block 2
+    </pre>
+
+    <p>The purpose of this comment tagging scheme is to allow for a tree
+    structure of comments to mirror the tree structure of the program
+    itself.&nbsp;  While M attaches no meaning to these comments, having a
+    clear definition of what sections of code a comment applies to may be
+    helpful to software that aids programmers, like M-aware editors,
+    integrated development environments, visual program structure display
+    systems, and the like.&nbsp;
+
+    </p></indent>
+
+  </p></indent>
+
+
+<h2 id="statements">Statements</h2><indent>
+
+  <p>M source is a succession of "statements".&nbsp;  All statements start
+  with a keyword that uniquely identifies the statement.&nbsp;  This
+  keyword must be the first non-blank on a line.&nbsp;  This means that
+  all statements start on a new line.&nbsp;  M statement keywords are
+  always lower case.&nbsp;
+
+  <p>Statements may be long, or it may be desirable to write them on
+  multiple lines for visual clarity.&nbsp;  M allows statements to span
+  multiple lines with some restrictions.&nbsp;  Unlike many other
+  languages, there is no explicit continuation character or end of
+  statement delimiter.&nbsp;
+
+  <p>Some statements may require or allow a particular set of
+  substatements.&nbsp;  These in turn may have other substatements.&nbsp;
+  The sequence of M statements comprising a M program therefore form a
+  tree structure.&nbsp;  The depth of a statement within parent statements
+  is referred to as the <i>nesting level</i>.&nbsp;  Top level statements
+  have a nesting level of 0, with the nesting level increasing by 1 each
+  level down the tree hierarchy.&nbsp;  As will be described below,
+  indentation is used to define the nesting level of each statement.&nbsp;
+
+  <h3 id="statements-indentation">Indentation</h3><indent>
+
+    <p><b>Whether a line starts a new statement, is a subordinate
+    statement, or continues the previous statement depends on the
+    indentation level</b> of that line.&nbsp;
+
+    <p>The number of blank characters at the start of a line before the
+    first printable character identifies the indentation level.&nbsp; One
+    indentation level corresponds to two indentation characters.&nbsp;
+    Each higher indentation level (first non-blank is two characters more
+    to the right) indicates one deeper nesting level in the statement
+    hierarchy.&nbsp;
+
+    <p>Lines that continue the previous statement, also referred to as
+    "continuation lines", are indented two levels from the start of the
+    statement.&nbsp; Since it is not possible to immediately jump two
+    levels deeper than the previous statement, two indentation levels are
+    used to indicate a continuation of the previous statement as apposed
+    to the start of a subordinate statement.&nbsp;
+
+    <p>Some statements start a block of code.&nbsp; Statements inside such
+    a     block are said to be subordinate to the statement that started
+    the block, and are indented one level from that statement.&nbsp;
+
+    <p><b>These indentation and nesting rules are rigidly and universally
+    applied in M</b>.&nbsp;
+
+    <p>If a new line is at the same indentation level as the previous
+    line,     then it starts a new statement at the same nesting level and
+    subordinate to the same parent statement as the previous line.&nbsp;
+    By the same logic, a new line indented one level less than the
+    previous line starts a new statement at the same level as the parent
+    of the previous line.&nbsp; This is how blocks of statements are
+    ended.  The first statement at a lesser indentation level is no longer
+    in the same block as previous statements.&nbsp;  In fact, this is the
+    only way to end a block in M.&nbsp;  M has no explicit end of
+    statement or end of block syntax.&nbsp;
+
+    <p>Here is a example illustrating the indentation rules described
+    above:&nbsp;
+
+    <pre>
+<b>topstatement</b>                           'top level statement
+    <b>temperature</b> 39                     'continued
+    <b>name</b> "chicken" <b>street</b> "Maple Ave"  'continued, still part of <b>topstatement</b>
+<b>anotherstatement</b>                       'second top level statement
+<b>startblock</b>                             'starts a code block structure
+    27 32 "stuff"                      'parameters to <b>startblock</b> statement
+  <b>dosomestuff</b>                          'first statement in block
+    <b>values</b>                             'substatement to <b>dosomestuff</b>
+        27 39 "hike"                   'parameters to <b>values</b>
+  <b>domorestuff</b>                          'second statement in code block
+      13 17 19                         'parameters to <b>domorestuff</b>
+<b>dosomestuff values</b> 4 6 8               'at top level, no longer in code block
+    </pre>
+
+    <p>A new statement can be any number of indentation levels back from
+    the previous statement, but can be at most one indentation level
+    further into the line.&nbsp;
+
+    </p></indent>
+
+  </p></indent>
+
+
+<h2 id="symbols">Symbols</h2><indent>
+
+  <p>The names assigned to various entities in a program are referred to
+  as <i>symbols</i>.&nbsp;  Examples are the names representing variables,
+  subroutines, and data types.&nbsp;  The rules for symbol names are:<ul>
+
+    <li>Symbol names are case-sensitive.&nbsp;
+
+    <li>Symbol names are 1 to 32 characters long.&nbsp;
+
+    <li>The first character of a symbol name is a letter, specifically a-z
+    or A-Z.&nbsp;
+
+    <li>Subsequent characters (not the first) may be a letter (a-z, A-Z),
+    a decimal digit (0-9), or the underscore character (_).&nbsp;
+
+    </ul>
+
+  <p>Each symbol must be unique within its <i>namespace</i>.&nbsp;
+  Namespaces are tree structured, and are themselves identified by
+  symbols.&nbsp;
+
+  <p>A Symbol name can be <i>unqualified</i>, which means it is written as
+  a bare name and the namespace hierarchy it is defined in is not
+  explicitly stated.&nbsp;  In that case a set of default rules are
+  applied to find the specific symbol being referenced.&nbsp;  These rules
+  are context-sensitive, and not defined here.&nbsp;  In general however,
+  the matching symbol is used from the lowest namespace in the current
+  hierarcy.&nbsp;  For example, if a global variable <tt>count</tt> is
+  defined and a variable <tt>count</tt> is also defined within a
+  subroutine, then unqualified references <tt>count</tt> in that
+  subroutine will refer to the local variable, not the global.&nbsp;
+
+  <p>Sometimes it is necessary or desirable to explicitly specify the
+  namespace of a symbol.&nbsp;  Such a symbol reference is referred to as
+  <i>qualified</i> and contains one or more namespace names in addition to
+  the end symbol name within the last namespace.&nbsp;  Inidividual
+  namespace or symbol names within a qualified symbol reference are
+  separated from each other with the colon (:) character.&nbsp;  The names
+  are listed in global to local order.&nbsp;  For example, the qualified
+  reference <tt>mysub:count</tt> refers to the symbol <tt>count</tt>
+  within the <tt>mysub</tt> namespace.&nbsp;
+
+  <p>Note that the example reference <tt>mysub:count</tt> in the previous
+  paragraph is still relative.&nbsp;  The reference to <tt>mysub</tt> will
+  be resolved using default rules in the current context.&nbsp;  A
+  <i>fully qualified</i> symbol reference starts at the root namespace and
+  no context-sensitive rules are or can be applied to its
+  interpretation.&nbsp; A fully qualified (also referred to as
+  <i>absolute</i>) symbol reference starts with the colon (:)
+  character.&nbsp;  The leading colon refers to the root namespace, with
+  the first name being defined immediately within the root.&nbsp;
+
+  <p>A namespace defined immediately within the root namespace is referred
+  to as a <i>top level</i> namespace.&nbsp;  The top level namespace
+  <tt>M</tt> is reserved for symbols defined by the M language.&nbsp;
+  This namespace and any symbols within it can not be defined in M
+  code.&nbsp; There are other reserved namespace names and other rules
+  that refer to namespaces.&nbsp;  These are described in more detail
+  elsewhere in this document.&nbsp;
+
+  <p>In the syntax definitions in the document, whenever a symbol name is
+  referred to it may be unqualified or partially or fully qualified unless
+  explicitly stated otherwise.&nbsp;
+
+  </p></indent>
+
+<hr><!-- ---------------------------------------------------------------------->
+
+<ul>
+  <li><a rel="next" href="memory.htm">Next chapter</a>
+  <li><a rel="prev" href="doc.htm">Previous chapter</a>
+  <li><a rel="contents" href="index.htm#contents">Table of Contents</a>
+  <li><a rel="start" href="index.htm">First page</a>
+  </ul>
+
+</body></html>

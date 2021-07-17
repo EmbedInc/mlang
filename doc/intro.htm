@@ -1,0 +1,298 @@
+<html lang="en-US">
+<head>
+  <link rel="stylesheet" href="../../../document.css"></link>
+  <link rel="stylesheet" href="../../document.css"></link>
+  <link rel="stylesheet" href="../document.css"></link>
+  <link rel="stylesheet" href="document.css"></link>
+  <title>M Language</title>
+  </head>
+<body>
+
+<h1 class=page>The M Computer Language
+  <br>Introduction</h1>
+<p class=page>Olin Lathrop, 16 March 2014
+  <br>Last updated 17 July 2021</p>
+
+
+<h2 id="motivation">Motivation</h2><indent>
+
+  <p>Small resource-limited embedded systems often have exotic
+  architectures and unsusual constraints not seen on mainstream computing
+  systems, or at least not seen thru the various layers of abstraction
+  high level language code is written to.&nbsp;  Mainstream general
+  computing languages, like C for example, therefore are difficult to
+  apply to small or unusual systems, can not surface important features of
+  the underlying hardware to the programmer, or require significant
+  non-standard enhancements to serve a particular system well.&nbsp;
+
+  <p>Another problem with the current state of affairs is that just about
+  all serious compilers for microcontrollers are some variant of C.&nbsp;
+  The many unfortunate syntax and other choices in the design of C make it
+  a poor language for writing good code on any platform, let alone on one
+  where the compiler was extended in unnatural ways.&nbsp;
+
+  <p>C promotes bad programming.&nbsp; It is possible to write good code
+  in C, but it requires knowledge of computer science, understanding of
+  why following a set of self-imposed rules leads to better code, and the
+  discipline to follow them.&nbsp;  However, most programmers of
+  microcontrollers have an electrical engineering, not computer science
+  background.&nbsp;  Too many are frankly bad programmers, and demand a
+  language from the microcontroller vendor that they are already familiar
+  with or requires as little as possible to learn to get some short term
+  results.&nbsp;  They have little concept of how things could be better
+  because they have never been exposed to better, and lack the computer
+  science knowledge and discipline to imagine better.&nbsp;
+
+  <p>A good grasp of the underlying hardware is essential when writing
+  code directly to it without layers of abstraction in between.&nbsp;
+  This is why programmers for microcontrollers are typically chosen to be
+  skilled in electronics in favor of computer science.&nbsp;  It is also
+  often convenient and practical to have the same engineer that designed
+  the circuit write the code for the microcontroller.&nbsp;
+
+  <p>The current state of affairs is therefore that non-experts in
+  computer science are stuck with a language never intended for the
+  architectures they are writing code on, that requires significant
+  expertise to use well, and its shortcomings and how they could be
+  addressed are not well known to the programmers.&nbsp;  Unfortunately
+  this is a intolerable situation for those that do wish to write code
+  well and have the expertise to know the difference.&nbsp;
+
+  <p>M is intended as a alternative to the current state of affairs,
+  designed from the beginning with resource-limited systems, varied
+  architectures, and non-expert programmers in mind.&nbsp;
+
+  <p>While the main motivation is to have a good language for writing code
+  on small machines, M is also an opportunity to add some constructs and
+  features to a high level language that I have often wished were
+  available regardless of the type of underlying machine.&nbsp;  These
+  includes more flexible ways of exiting loops and other execution blocks
+  in a block structured fashion, different means to specify call
+  arugments, and more.&nbsp; Details on such things are later in this
+  document.&nbsp;
+
+  </p></indent>
+
+
+<h2 id="design goals">Design Goals</h2><indent>
+
+  <p>The goals to be considered when making design choices for M, in most to
+  least important order, are:<ol>
+
+    <li>
+
+      <p>M must have native support for various memory
+      architectures.&nbsp; Most general purpose computing platforms are
+      Von Neuman machines, meaning they have a single address space, or at
+      least the environment the code will run in sees a single address
+      space.&nbsp;
+
+      <p>Most microcontrollers aren't like that.&nbsp;  It is quite common
+      to have executable code in a different address space with a
+      different address width and word size than data.&nbsp;  Non-volatile
+      data memory may be in yet another address space.&nbsp;  Constants
+      may be treated differently in the hardware.&nbsp;
+
+      <p>Certain regions of some address spaces may be special in various
+      ways.&nbsp;  For example, some instructions may be able to operate
+      directly on data in a limited region (often called "near" memory),
+      while more general but slower means are required to address data in
+      other parts of the same address space.&nbsp;  Some microcontrollers
+      allow special bit operations only within a limited region.&nbsp;
+      "Banked" architectures are common, where the hardware is put in a
+      state to only address one of multiple banks of memory at a time, but
+      there can also be regions that are unbanked and always accessible
+      regardless of the bank setting.&nbsp;  The rules are often different
+      for direct and indirect addressing.&nbsp;  On a PIC 18, for example,
+      direct data memory references are banked, but indirect references
+      thru one of the hardware pointer registers are unbanked.&nbsp;  On a
+      PIC 16, direct addressed banks are 128 bytes in size, whereas
+      indirect addressed banks are 256 bytes in size.&nbsp;
+
+      <p>The point is not any of these specific examples, but rather that
+      many different memory architectures are out there, and M needs to
+      handle as much of them as possible natively, and thereby allow the
+      programmer to utilize them effectively.&nbsp;
+
+    <li>
+
+      <p>M should be well readable, and likely to be interpreted correctly
+      by non-experts.&nbsp;  Ultimately it is the programmer's
+      responsibility to know the details of the language.&nbsp;  However,
+      the language syntax, keywords, and visual structure should
+      illuminate rather than obfuscate.&nbsp; Not only should M appear to
+      be understandable, but the understanding thus derived by a
+      non-expert must have a good chance of being correct.&nbsp;
+
+      <p>This goal dictates several tradeoffs.&nbsp;  Keywords should be used
+      in favor of special characters with non-obvious or special meaning only
+      to the particular language.&nbsp;  For example, BEGIN ... END is
+      preferred to << ... >>, { ... }, or other special characters.&nbsp;
+      Keywords, when used, must also be well chosen to give a high probability
+      of correct understanding to a programmer not skilled in the language, or
+      computer science, and not aware of common "everybody knows" lore.&nbsp;
+      Cutesy "in" names are right out.&nbsp; For example, IF ... ENDIF is
+      preferred over IF ... FI.&nbsp;
+
+      <p>Keywords and symbols should also have as close a meaning as possible
+      to their everyday usage in natural language or other disciplines outside
+      of computer science.&nbsp;  For example, the equals sign (=) is a
+      statement of equality outside of computer science.&nbsp;  If used, it
+      should stand for a statement of equality.&nbsp;  Re-purposing it as a
+      assignment or other operator is a bad idea.&nbsp;  The M assignment
+      operators were deliberatly chosen to give the visual indication of a
+      value being moved from one place to another.&nbsp;
+
+      <p>This goal may cause the language to be more verbose than
+      others.&nbsp;  So be it if it enhances clarity and decreases the chance
+      of human error.&nbsp;  Whether a source file takes 2 Kbytes or 2.3
+      Kbytes on the disk is immaterial in today's environment.&nbsp;  It is
+      far more important that a few hours not be wasted by making a small but
+      syntax-legal typo.&nbsp;
+
+      <p>This is not to say that verboseness is a goal or that it is
+      good.&nbsp;  Verboseness by itself is immaterial.&nbsp;  It is good if
+      it enhances clarity and reduces the chance of error.&nbsp;  It is  bad
+      if excessive babble obscures the underlying information and thereby
+      reduces clarity.&nbsp;  The point is that clarity is the goal, and the
+      verboseness versus terseness tradeoff falls where it falls to serve that
+      goal.&nbsp;
+
+    <li>Syntax and semantic details should be chosen with likely human
+    errors in mind, and minimize the chance of these likely errors resulting
+    in valid code with unintended operation.&nbsp;
+
+    <li>
+
+      <p>The power of the compiler should be used to enforce rules and
+      methodologies that have been found to result in better code.&nbsp;
+
+      <p>A good example of this is type checking.&nbsp;  M forces the
+      programmer to explicitly declare symbols used and their
+      attributes.&nbsp; The rigid definitions prevent the compiler from
+      making choices on its own, which could have unexpected
+      consequences.&nbsp;  It is better to make the programmer explicitly
+      declare a variable, for example, than have him chase a bug because
+      the compiler defaulted to integer interpretation when the programmer
+      was thinking floating point.&nbsp;
+
+      <p>Strong type checking has been proven repeatedly to catch
+      programmer errors before they become bugs.&nbsp;  M therefore has
+      strong type checking.&nbsp; However, in special circumstances,
+      especially on resource-limited systems, it may be useful to
+      circumvent such rules.&nbsp;  M will provide ways of specifically
+      and locally circumventing rules when the programmer really wants
+      to.&nbsp;  However this is only done within the following
+      guidelines:<ul>
+
+        <li>A special syntax is required to circumvent these rules.&nbsp;
+
+        <li>The special syntax is verbose enough to not occur by accident
+        or from likely mistyping.&nbsp;  In other words, it will require a
+        concious deliberate act by the programmer to circumvent the
+        rules.&nbsp;
+
+        <li>The special syntax will make it obvious to a reader that the
+        rules have been circumvented.&nbsp;  In other words, it should be
+        difficult to circumvent the rules and visually hide this in the
+        source code.&nbsp;
+
+        <li>Circumventing the rules can only be done locally one instance
+        at a time.&nbsp; Compiler command line switches, source code
+        switches that apply to large chunks of code, and the like that
+        circumvent the rules are specifically prohibited.&nbsp;
+
+        </ul>
+
+    <li>
+
+      <p>Constructs should not be overloaded to have multiple and
+      unobvious consequences.&nbsp;  For example, the C notion of a
+      assignment operation also being a expression and therefore having a
+      value is a blatant example of the kind of irresponsible constructs
+      this goal aims to prevent.&nbsp;
+
+      <p>Let each construct do the one thing it appears to do without
+      hidden consequences.&nbsp;  If you want to do two things, use two
+      constructs that each clearly state the individual things they
+      do.&nbsp;  With modern compiler and optimizer technology, it will be
+      hard to find a case of individual serial constructs that don't
+      result in the same machine code as one overloaded construct.&nbsp;
+      In fact, the overloaded construct may result in larger code because
+      the compiler is unable to determine that one or more of its side
+      effects are unused.&nbsp;
+
+    <li>
+
+      <p>Keywords, special symbols, structure, and the like will be based
+      on the english language.&nbsp;  It would be nice if programmers with
+      any native language background could feel at home writing M.&nbsp;
+      Unfortunately, that is not possible.&nbsp; Scattered names from
+      different languages is not the answer, as it will feel foreign to
+      everyone and therefore appeal to none.&nbsp;
+
+      <p>It is better to do a really good job being intuitive in one
+      language than to be partially intuitive in various languages.&nbsp;
+      English is the obvious choice since it is either the native language
+      or a well known language to far more programmers than any
+      other.&nbsp;
+
+      <p>Futhermore, with this choice being made, it will be embraced
+      whole-heartedly.&nbsp; There will be no apologies or appeasement of
+      political correctness in striving for optimum clarity for native
+      english speakers.&nbsp;  While I regret that this may cause some to
+      feel left out, it will make M a better language to far more people
+      than it will alienate.&nbsp;
+
+    <li>
+
+      <p>It is desirable to have M code written by one programmer be
+      easily understandable by others.&nbsp;  To this end, some code
+      structure and choices generally referred to as "style" will be
+      defined by M and enforced by the compiler.&nbsp;  Compiler switches,
+      source code options, or the like to allow for alternate styles or
+      relaxed enforcement are specifically prohibited.&nbsp;
+
+      <p>No matter what style is chosen, it will be contrary to some
+      people's preferences.&nbsp; However, having a uniform structure and
+      visual appearance to all M source code will ultimately result in
+      software maintainance savings and fewer errors.&nbsp;  Also note
+      that while every programmer has evolved some set of style rules for
+      himself, these are all for other languages.&nbsp;  Nobody will
+      develop their own M style and then be forced to change it.&nbsp;
+      Hopefully the M syntax will make it feel different enough that being
+      forced to use a different style will be no worse than using a
+      different language in the first place.&nbsp;
+
+      <p>The enforced styles will be chosen to maximize visual clarity of
+      structure.&nbsp;  One example is indentation level to show nesting
+      of code structures.&nbsp;  Even if the nesting is unambiguous to the
+      compiler from the history of statements without interpreting
+      indentation, indentation is the primary means to show structure
+      nesting to humans.&nbsp;  The compiler will therefore insist on
+      correct indentation, which in turn allows human readers to rely on
+      it.&nbsp;
+
+      <p>Obviously, many things can't be enforced, and programmers will
+      still have considerable style latitude.&nbsp;  If I could think of a
+      way of having the compiler discern good comments from bad, I
+      would.&nbsp;  But alas, bad comments will be with us for the
+      forseeable future.&nbsp;  M may enforce the existance of comments in
+      certain cases, but it can't enforce their content.&nbsp;  The hope
+      is that when forced to write a comment anyway, the programmer will
+      write something meaningful.&nbsp;
+
+    </p></ol><!-- End of design goals list -->
+
+  </indent>
+
+<hr><!-- ---------------------------------------------------------------------->
+
+<ul>
+  <li><a rel="next" href="doc.htm">Next chapter</a>
+  <li><a rel="prev" href="index.htm">Previous chapter</a>
+  <li><a rel="contents" href="index.htm#contents">Table of Contents</a>
+  <li><a rel="start" href="index.htm">First page</a>
+  </ul>
+
+</body></html>

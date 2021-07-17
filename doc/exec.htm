@@ -1,0 +1,269 @@
+<html lang="en-US">
+<head>
+  <link rel="stylesheet" href="../../../document.css"></link>
+  <link rel="stylesheet" href="../../document.css"></link>
+  <link rel="stylesheet" href="../document.css"></link>
+  <link rel="stylesheet" href="document.css"></link>
+  <title>M Language</title>
+  </head>
+<body>
+
+<h1 class=page>The M Computer Language
+  <br>Executable Statements</h1>
+<p class=page>Last updated 17 July 2021</p>
+
+
+<h2 id="assign">Assignment</h2><indent>
+
+  <p>Assignment is the act of setting a variable to a particular value, or
+  writing a value into a variable.&nbsp;  Assignment is signified in M
+  with the operators <tt><b>&gt;&gt;</b></tt> and
+  <tt><b>&lt;&lt;</b></tt>.&nbsp;  These were chosen to give the visual
+  cue of a value being moved right and left, respectively.&nbsp;
+
+  <p>The explicit assignment statement is:
+
+  <p><tt>[<b>set</b>] <i>name</i> <b>&lt;&lt;</b> <i>expression</i></tt>
+
+  <p>The value of <tt><i>expression</i></tt> is written into the variable
+  identified by the symbol <tt><i>name</i></tt>.&nbsp;
+
+  <p>The <tt><b>set</b></tt> keyword is optional and not needed in most
+  cases.&nbsp;  The <tt><b>set</b></tt> keyword forces
+  <tt><i>name</i></tt> to be interpreted as the symbol name of a
+  variable.&nbsp;  This can be convenient, for example, if that symbol
+  name by itself would be ambiguous, such as conflicting with a M
+  keyword.&nbsp;  Alternatively, the variable name could be qualified to
+  the point where it unambigously specifies the intended variable.
+
+  </p></indent>
+
+
+<h2 id="if">Conditional</h2><indent>
+
+  <p>The conditional ("if") statement has two forms:</p><indent>
+
+    <pre><tt>
+<b>if</b> <i>boolean-expression</i> <b>then</b>
+  <i>statements</i>
+</tt></pre>
+    </indent>
+
+  <p>and</p><indent>
+
+    <pre><tt>
+<b>if</b> <i>boolean-expression</i>
+  <b>then</b>
+    <i>statements</i>
+  <b>else</b>
+    <i>statements</i>
+</tt></pre>
+    </indent>
+
+  <p>The statements after <tt><b>then</b></tt> are executed iff the
+  boolean expression is true.  In the second case, the statements
+  after <tt><b>else</b></tt> are executed iff the boolean expression
+  is false.  It is permissible for there to be no statements following
+  <tt><b>then</b></tt> or <tt><b>else</b></tt>.
+
+  </p></indent>
+
+
+<h2 id="choose">Multiple choices</h2><indent>
+
+<pre><tt>
+<b>pick</b> [<b>one</b> | <b>first</b> | <b>all</b>] [<b>by</b> <i>expression</i>]
+  <b>option</b> <i>expression</i>
+    <i>statements</i>
+  ...
+  <b>option</b> <i>expression</i>
+    <i>statements</i>
+  <b>otherwise</b>
+    <i>statements</i>
+</tt></pre>
+
+  <p>The <tt><b>pick</b></tt> statement conditionally executes multiple
+  sections of code.  The statements in each <tt><b>option</b></tt> block
+  and the <tt><b>otherwise</b></tt> block are either wholly executed or
+  not executed at all.
+
+  <p>At most one of the <tt><b>one</b></tt>, <tt><b>first</b></tt>, and
+  <tt><b>all</b></tt> keywords may be used.  The default is
+  <tt><b>one</b></tt> when none are specified.
+
+  <p>The <tt><b>one</b></tt> keyword allows at most one
+  <tt><b>option</b></tt> block to be executed.  When the
+  <tt><b>by</b></tt> clause is also present, then all
+  <tt><b>option</b></tt> expresions that can be evaluated at compile time
+  must be unique.  The first <tt><b>option</b></tt> block eligible for
+  execution is executed, then the <tt><b>pick</b></tt> statement is
+  terminated.
+
+  <p>The <tt><b>first</b></tt> keyword causes at most one
+  <tt><b>option</b></tt> block to be executed.  The first
+  <tt><b>option</b></tt> block eligible for execution is executed, then
+  the <tt><b>pick</b></tt> statement is terminated.
+
+  <p>The <tt><b>all</b></tt> keyword causes all <tt><b>option</b></tt>
+  blocks that are eligible for execution to be executed.  Option blocks
+  are executed in the order they appear in the <tt><b>pick</b></tt>
+  statement.
+
+  <p>When the <tt><b>by</b></tt> clause is not present, then each
+  <tt><b>option</b></tt> expression must evaluate to a boolean value.  The
+  <tt><b>option</b></tt> block is eligible for execution when that boolean
+  value is TRUE.
+
+  <p>When the <tt><b>by</b></tt> clause is present, then each
+  <tt><b>option</b></tt> block is eligible for execution when the value of
+  its <tt><ii>expression</ii></tt> matches the value of
+  <tt><ii>expression</ii></tt> after the <tt><b>by</b></tt> keyword. Each
+  option <tt><ii>expression</ii></tt> must be convertable to the data type
+  of <tt><ii>expression</ii></tt> after the <tt><b>by</b></tt> keyword.
+
+  <p>The statements following <tt><b>otherwise</b></tt> are executed iff
+  no <tt><b>option</b></tt> block is executed.  The
+  <tt><b>otherwise</b></tt> sub-statement is optional.
+
+  </p></indent>
+
+
+<h2 id="call">Subroutine Call</h2><indent>
+
+  <p><tt>[<b>call</b>] <i>name</i> <i>parameter</i> ...
+  <i>parameter</i></tt>
+
+  <p>The subroutine identified by the symbol <tt><i>name</i></tt> is
+  called with parameters (sometimes referred to as <i>arguments</i> in
+  other computer languages) passed to it according to the list of
+  parameters following <tt><i>name</i></tt>.&nbsp;
+
+  <p>The <tt><b>call</b></tt> keyword is optional and not needed in most
+  cases.&nbsp;  The <tt><b>call</b></tt> keyword forces
+  <tt><i>name</i></tt> to be interpreted as the symbol name of a
+  subroutine.&nbsp;  This can be convenient, for example, if that symbol
+  name by itself would be ambiguous, such as conflicting with a M
+  keyword.&nbsp;  Alternatively, the subroutine name could be qualified to
+  the point where it unambigously specifies the intended subroutine.
+
+  <p>Parameter names may appear in any order.  A particular parameter name
+  may appear at most once in a subroutine call.&nbsp;
+
+  <p>Each parameter may be input, output, or input and output.  Inputs are
+  always values determined at the time of the subroutine call, before the
+  subroutine is executed.  Outputs are used by supplying a variable to
+  write the output value to. It must be possible to unambiguously convert
+  the output value to the data type of the variable.
+
+  <p>For a parameter that takes an input value, a value must be supplied
+  in the call unless a default is defined for that parameter in the
+  subroutine declaration.
+
+  <p>It is not required that output values be used.  When no destination
+  is provided for an output value, that output value is silently discarded.
+
+  <p>The syntax of each <tt><i>parameter</i></tt> must be one of those
+  listed below.  In these cases, <tt><i>name</i></tt> is always the name
+  of a subroutine parameter as defined in the subroutine
+  declaration:</p><indent>
+
+    <h3><tt><i>name</i> <b>&lt;&lt;</b> <i>value</i></tt>
+    <br><tt><i>name value</i></tt></h3><indent>
+
+      <p>The value is passed in to the subroutine for the indicated
+      parameter.  If that parameter returns a value, it is discarded.
+
+      <p>The parameter must be declared to take an input value.
+
+      </p></indent>
+
+    <h3><tt><i>name</i> <b>&gt;&gt;</b> <i>variable</i></tt></h3><indent>
+
+      <p>The value returned by the indicated parameter is written to the
+      variable.  No input value is supplied for the parameter, so the
+      parameter must either not be declared as input, or have a default
+      input value defined in the subroutine declaration.
+
+      <p>The parameter must be declared to return an output value.
+
+      </p></indent>
+
+    <h3><tt><i>name variable</i></tt></h3><indent>
+
+      <p>References to the parameter inside the subroutine become references
+      to the indicated variable.  The subroutine may read and write the
+      variable value any number of times.
+
+      <p>This type of <tt><i>parameter</i></tt> is only allowed when the
+      parameter is declared to have both a input and output value.  The
+      default input value, if any, is irrelevant.
+
+      </p></indent>
+
+    <h3><tt><i>name</i> <b>&lt;&lt;</b> <i>value</i> <b>&gt;&gt;</b>
+    <i>variable</i></tt></h3><indent>
+
+      <p><tt><i>Value</i></tt> supplies the input value to the parameter,
+      and the output value is written to the indicated variable.
+
+      <p>This type of <tt><i>parameter</i></tt> is only allowed when the
+      parameter is declared to have both a input and output value.  The
+      default input value, if any, is irrelevant.
+
+      </p></indent>
+
+    </p></indent>
+
+  </p></indent>
+
+
+<h2 id="call">Function call</h2><indent>
+
+  <p><tt><b>(</b><i>name parameter ... parameter</i><b>)</b></tt>
+
+  <p>The function identified by <tt><i>name</i></tt> is called, and
+  the entire section of code within the parenthesis is effectively
+  replaced by the value returned by the function.  The call parameters
+  to the function are specified the same as in a subroutine call, see
+  above.
+
+  <p>The function name symbol must be qualified sufficiently to
+  unambiguously identify a function.
+
+  </p></indent>
+
+
+<h2 id="block">Context block</h2><indent>
+
+  <p><tt><b>block</b> [<i>name</i>]</tt>
+
+  <p>The <tt><b>block</b></tt> statement is a container for the
+  immediately following subordinate statements.  It has no direct function
+  other than to provide a context for the subordinate statements. The
+  block is ended before the first statement that is no longer subordinate
+  to the block (see <a href="syntax.htm#statements-indentation">
+  <i>indentation</i> </a> for how the statement tree structure is
+  specified).
+
+  <p>The optional <tt><i>name</i></tt> parameter explicitly names the
+  block.  When <tt><i>name</i></tt> is not provided, the name of the block
+  defaults to <tt>block</tt>.  Everything inside the block exists in a
+  subordinate namespace, with <tt><i>name</i></tt> being the leaf name of
+  that namespace.
+
+  <p>Block control statements such as <tt><b>quit</b></tt> and
+  <tt><b>repeat</b></tt> can be used inside the block.
+
+  </p></indent>
+
+
+<hr><!-- ---------------------------------------------------------------------->
+
+<ul>
+  <li><a rel="next" href="preproc.htm">Next chapter</a>
+  <li><a rel="prev" href="symnames.htm">Previous chapter</a>
+  <li><a rel="contents" href="index.htm#contents">Table of Contents</a>
+  <li><a rel="start" href="index.htm">First page</a>
+  </ul>
+
+</body></html>
