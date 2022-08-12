@@ -1,7 +1,7 @@
 {   M compiler.
 }
-program mlang;
-%include 'mlang.ins.pas';
+program mcomp;
+%include 'mcomp.ins.pas';
 
 const
   max_msg_args = 2;                    {max arguments we can pass to a message}
@@ -156,12 +156,17 @@ done_opts:                             {done with all the command line options}
 {
 *   The preprocessor output is the collection of lines pointed to by COLL_P,
 *   under the FLINE library use pointed to by FL_P.
-*
+}
+
+
+{
 *   ***** TEMP DEBUG *****
 *
 *   Show each resulting line with its line number and where it came from.
 }
-  mlang_dbg_coll (coll_p^);            {show the data in the postprocessed collection}
+  mcomp_dbg_coll (coll_p^);            {show the data in the postprocessed collection}
+
+
 
   fline_lib_end (fl_p);                {end this use of the FLINE library}
   end.

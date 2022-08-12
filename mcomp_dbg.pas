@@ -1,16 +1,16 @@
-{   Routines intended to be useful in debugging the MLANG program.
+{   Routines intended to be useful in debugging the MCOMP program.
 }
-module mlang_dbg;
-define mlang_dbg_coll;
-%include 'mlang.ins.pas';
+module mcomp_dbg;
+define mcomp_dbg_coll;
+%include 'mcomp.ins.pas';
 {
 ********************************************************************************
 *
-*   Subroutine MLANG_DBG_COLL (COLL)
+*   Subroutine MCOMP_DBG_COLL (COLL)
 *
 *   Show the contents of the collection COLL.
 }
-procedure mlang_dbg_coll (             {show contents of a collection}
+procedure mcomp_dbg_coll (             {show contents of a collection}
   in      coll: fline_coll_t);         {the collection to show}
   val_param;
 

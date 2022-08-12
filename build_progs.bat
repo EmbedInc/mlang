@@ -7,4 +7,4 @@ rem
 setlocal
 call build_pasinit
 
-call "%sourcedir%\build_mlang_prog"
+call "%sourcedir%\build_mcomp_prog"

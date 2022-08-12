@@ -9,6 +9,6 @@
 %include 'escr.ins.pas';
 %include 'syn.ins.pas';
 
-procedure mlang_dbg_coll (             {show contents of a collection}
+procedure mcomp_dbg_coll (             {show contents of a collection}
   in      coll: fline_coll_t);         {the collection to show}
   val_param; extern;

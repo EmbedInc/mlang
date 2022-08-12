@@ -1,0 +1,7 @@
+                           Embed program MCOMP
+                              12 August 2022
+
+mcomp [options]
+
+M compiler.  See the MLANG documentation file for details of the M
+language.
