@@ -4,4 +4,23 @@
 mcomp [options]
 
 M compiler.  See the MLANG documentation file for details of the M
-language.
+language.  The command line parameters are:
+
+  -IN filename
+  filename
+
+    Specifies the M language source file to take as input.  The second
+    form of this command line option (without the -IN keyword) is a
+    shortcut that is only valid if the input file name has not been
+    previously set, and it does not start with a dash (-).
+
+    The mandatory ".m" file name suffix may be omitted from FILENAME.
+
+  -PRE
+
+    Show the result of the preprocessed source only.  No compilation is
+    performed.
+
+  -V
+
+    Show the program version, then exit.
