@@ -1,0 +1,101 @@
+/*   Syntax definition of the M language.
+/*
+.symbol pad[mcomp_syn_pad] external    /* space allowed, comment, wrapped line, etc
+.symbol space[mcomp_syn_space] external /* space or new line required
+.symbol end_statement[mcomp_syn_endst] external /* end of statement, eventually EOL
+.symbol name                           /* single bare symbol name
+.symbol qname                          /* symbol name that may be qualified
+.symbol integer                        /* Embed integer, B#DDDDDDD
+.symbol expression                     /* arbitrary expression that resolves to a value
+.symbol accesstype                     /* memory access type
+
+.symbol statement[mcomp_syn_statement] /* one statement
+/*
+/*   Parts of statements that follow the keyword.  These have the name of the
+/*   statement with underscore appended.
+/*
+.symbol memory_
+.symbol memregion_
+.symbol address_
+.symbol adrregion_
+.symbol set_
+
+.define name .as                       /* bare symbol name
+  (.range['a' thru 'z'] .or .range['A' thru 'Z'])
+  .occurs[0 to inf] (
+    .range['a' thru 'z'] .or
+    .range['A' thru 'Z'] .or
+    .range['0' thru '9'] .or
+    "_"
+    )
+
+.define qname .as                      /* possibly qualified symbol name
+  .optional ":"[1]
+  name[2]
+  .occurs[1 to inf] (":" name[2])
+
+.define integer .as                    /* integer in standard Embed format
+  .optional ("-" .or "+")
+  .optional (
+    .occurs[1 to inf] .range["0" thru "9"]
+    "#"
+    )
+  .occurs[1 to inf] (
+    .range["0" thru "9"] .or
+    .range["A" thru "Z"] .or
+    .range["a" thru "z"]
+    )
+
+.define expression .as                 /* arbitrary expression
+  integer[1]                           /* temp placeholder
+
+.define accesstype .as
+  .optional "-"[1]
+  "read"[2] .or
+  "write"[3] .or
+  "execute"[4]
+
+.define statement .as
+  (
+    ("memory" space memory_[1]) .or
+    ("memregion" space memregion_[2]) .or
+    ("address" space address_[3]) .or
+    ("adrregion" space adrregion_[4]) .or
+    ("set" space set_[5]) .or
+    set_[5]
+    )
+  end_statement
+
+.define memory_ .as
+  name[1]
+  .occurs[0 to inf] (
+    space
+    ("adrbits" space integer[1]) .or
+    ("datbits" space integer[2]) .or
+    ("access" space accesstype[3])
+    )
+
+.define memregion_ .as
+  name[1] space "in" space name[1]
+  .occurs[0 to inf] (
+    space
+    ("startadr" space integer[1]) .or
+    ("length" space integer[2]) .or
+    ("endadr" space integer[3]) .or
+    ("access" space accesstype[4])
+    )
+
+.define address_ .as
+  name[1]
+  .occurs[0 to inf] (
+    space
+    ("adrbits" space integer[1]) .or
+    ("datbits" space integer[2]) .or
+    ("access" space accesstype[3])
+    )
+
+.define adrregion_ .as
+  name[1] space "in" space name[1] space "to" space name[1]
+
+.define set_ .as
+  qname[1] pad "<<" pad expression[1]

@@ -6,6 +6,9 @@ setlocal
 call src_pas %srcdir% mcomp
 
 call src_pas %srcdir% mcomp_dbg
+call src_pas %srcdir% mcomp_parse
+call src_pas %srcdir% mcomp_syn
+call src_syn mlang
 
 call src_lib %srcdir% mcompprog private
 call src_msg %srcdir% mcomp

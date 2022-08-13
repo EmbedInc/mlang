@@ -3,6 +3,7 @@
 program mcomp;
 %include 'mcomp.ins.pas';
 %include 'builddate.ins.pas';
+define mcomp_com;                      {define common block for program global vars}
 
 const
   max_msg_args = 2;                    {max arguments we can pass to a message}
@@ -181,6 +182,16 @@ done_opts:                             {done with all the command line options}
     mcomp_dbg_coll (coll_p^);          {show the data in the postprocessed collection}
     goto abort1;
     end;
+{
+*   Parse the pre-processed result and build the in-memory structures
+*   representing the code.
+}
+  mcomp_parse (coll_p^, stat);         {parse the pre-processed collection of lines}
+  sys_error_abort (stat, '', '', nil, 0);
+
+
+
+
 
 
 abort1:                                {jump here to leave with FLINE library open}
