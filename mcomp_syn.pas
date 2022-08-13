@@ -4,7 +4,8 @@
 module mcomp_syn;
 define mcomp_syn_pad;
 define mcomp_syn_space;
-define mcomp_syn_endst;
+define mcomp_syn_stend;
+define mcomp_syn_level;
 %include 'mcomp.ins.pas';
 {
 ********************************************************************************
@@ -36,22 +37,41 @@ function mcomp_syn_space (             {parse SPACE syntax}
   val_param;
 
 begin
-  mcomp_syn_space := true;
+  mcomp_syn_space := true;             {NOT IMPLEMENTED YET}
   end;
 {
 ********************************************************************************
 *
-*   Function MCOMP_SYN_ENDST (SYN)
+*   Function MCOMP_SYN_STEND (SYN)
 *
-*   Parses the ENDST syntax contruction.  ENDST consumes all the white space at
+*   Parses the STEND syntax contruction.  STEND consumes all the white space at
 *   the end of a statement, up to and including the EOL.  Nothing other than
 *   white space is allowed.
 }
-function mcomp_syn_endst (             {parse ENDST syntax}
+function mcomp_syn_stend (             {parse STEND syntax}
   in out  syn: syn_t)                  {SYN library use state}
   :boolean;                            {TRUE iff input matched syntax template}
   val_param;
 
 begin
-  mcomp_syn_endst := true;
+  mcomp_syn_stend := true;             {NOT IMPLEMENTED YET}
+  end;
+{
+********************************************************************************
+*
+*   Function MCOMP_SYN_LEVEL (SYN)
+*
+*   Special parsing function that assumes to start on a new line, and finds the
+*   start of the next text and its nesting level.  The global variable NEXTLEVEL
+*   is set accordingly.  The parsing position will be left at the first real
+*   statement character.
+}
+function mcomp_syn_level (             {get level of next statement}
+  in out  syn: syn_t)
+  :boolean;
+  val_param;
+
+begin
+  mcomp_syn_level := true;             {NOT IMPLEMENTED YET}
+  nextlevel := mcomp_lev_eod_k;
   end;

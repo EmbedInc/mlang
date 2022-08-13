@@ -1,8 +1,8 @@
 /*   Syntax definition of the M language.
 /*
 .symbol pad[mcomp_syn_pad] external    /* space allowed, comment, wrapped line, etc
-.symbol space[mcomp_syn_space] external /* space or new line required
-.symbol end_statement[mcomp_syn_endst] external /* end of statement, eventually EOL
+.symbol space[mcomp_syn_space] external /* space or equivalent required
+.symbol statement_end[mcomp_syn_stend] external /* end of statement, no more substance allowed
 .symbol name                           /* single bare symbol name
 .symbol qname                          /* symbol name that may be qualified
 .symbol integer                        /* Embed integer, B#DDDDDDD
@@ -64,7 +64,7 @@
     ("set" space set_[5]) .or
     set_[5]
     )
-  end_statement
+  statement_end
 
 .define memory_ .as
   name[1]

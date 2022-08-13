@@ -8,6 +8,7 @@ call src_pas %srcdir% mcomp
 call src_pas %srcdir% mcomp_dbg
 call src_pas %srcdir% mcomp_parse
 call src_pas %srcdir% mcomp_syn
+call src_pas %srcdir% mcomp_syt
 call src_syn mlang
 
 call src_lib %srcdir% mcompprog private

@@ -1,4 +1,5 @@
 mcomp_dbg.obj
 mcomp_parse.obj
 mcomp_syn.obj
+mcomp_syt.obj
 mlang.obj
