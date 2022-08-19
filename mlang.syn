@@ -2,7 +2,7 @@
 /*
 .symbol pad[mcomp_syn_pad] external    /* space allowed, comment, wrapped line, etc
 .symbol space[mcomp_syn_space] external /* space or equivalent required
-.symbol statement_end[mcomp_syn_stend] external /* end of statement, no more substance allowed
+.symbol stlevel[mcomp_syn_stlevel] external /* to statement start, finds nesting level
 .symbol name                           /* single bare symbol name
 .symbol qname                          /* symbol name that may be qualified
 .symbol integer                        /* Embed integer, B#DDDDDDD
@@ -10,10 +10,7 @@
 .symbol accesstype                     /* memory access type
 
 .symbol statement[mcomp_syn_statement] /* one statement
-/*
-/*   Parts of statements that follow the keyword.  These have the name of the
-/*   statement with underscore appended.
-/*
+
 .symbol memory_
 .symbol memregion_
 .symbol address_
@@ -56,6 +53,7 @@
   "execute"[4]
 
 .define statement .as
+  stlevel                              /* skip over indentation, get nesting level
   (
     ("memory" space memory_[1]) .or
     ("memregion" space memregion_[2]) .or
@@ -64,8 +62,11 @@
     ("set" space set_[5]) .or
     set_[5]
     )
-  statement_end
-
+  pad .eol
+/*
+/*   Parts of statements that follow the keyword.  These have the name of the
+/*   statement with underscore appended.
+/*
 .define memory_ .as
   name[1]
   .occurs[0 to inf] (
