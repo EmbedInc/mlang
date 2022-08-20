@@ -56,8 +56,5 @@ function mcomp_syn_statement (         {parse one top level statement}
   :boolean;
   val_param; extern;
 
-procedure mcomp_sytl_statement;        {process STATEMENT, at link}
-  val_param; extern;
-
-procedure mcomp_syts_statement;        {process STATEMENT, at start}
+procedure mcomp_syt_statement;         {interpret STATEMENT}
   val_param; extern;

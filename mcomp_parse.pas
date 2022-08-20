@@ -49,7 +49,11 @@ begin
       end;
 
     syn_trav_init (syn_p^);            {init for traversing the syntax tree}
-    mcomp_syts_statement;              {process syntax tree for STATEMENT}
+    (*
+    syn_dbg_tree (syn_p^);             {TEMP DEBUG, show syntax tree}
+    *)
+
+    mcomp_syt_statement;               {process syntax tree for STATEMENT}
     if syn_parse_end(syn_p^) then exit; {hit end of input ?}
     end;                               {back to do next statement}
 {
