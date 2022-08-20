@@ -49,9 +49,9 @@ begin
       end;
 
     syn_trav_init (syn_p^);            {init for traversing the syntax tree}
-    (*
-    syn_dbg_tree (syn_p^);             {TEMP DEBUG, show syntax tree}
-    *)
+    writeln;
+    syn_dbg_tree_show (syn_p^);        {show the syntax tree}
+    writeln;
 
     mcomp_syt_statement;               {process syntax tree for STATEMENT}
     if syn_parse_end(syn_p^) then exit; {hit end of input ?}
