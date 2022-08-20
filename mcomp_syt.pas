@@ -32,7 +32,7 @@ begin
 {
 ********************************************************************************
 *
-*   Subroutine MCOMP_SYTS_STATEMENT_LEV
+*   Subroutine MCOMP_SYTS_STATEMENT
 *
 *   Process the STATEMENT syntax.  The current position is at the start of the
 *   STATEMENT level.

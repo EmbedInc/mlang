@@ -8,8 +8,8 @@ define mcomp_parse;
 *
 *   Subroutine MCOMP_PARSE (COLL, STAT)
 *
-*   Parse the pre-processed input and build the in-memory structured defining
-*   the code defined by the input.
+*   Parse the pre-processed input and build the in-memory structures for the
+*   code defined by that input.
 }
 procedure mcomp_parse (                {parse input, build in-memory structures}
   in var  coll: fline_coll_t;          {collection of text lines to parse}

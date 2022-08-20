@@ -35,6 +35,8 @@ label
 
 begin
 next_line:                             {back here to retry on next line}
+  mcomp_comm_newline;                  {tell comment system we are now on new line}
+
   indent := 0;                         {init number spaces indentation found}
   while true do begin
     syn_p_cpos_get (syn, pos);         {save parsing postion before this new char}

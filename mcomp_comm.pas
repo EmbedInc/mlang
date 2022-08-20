@@ -2,6 +2,7 @@
 }
 module mcomp_comm;
 define mcomp_comm_get;
+define mcomp_comm_newline;
 %include 'mcomp.ins.pas';
 {
 ********************************************************************************
@@ -19,7 +20,7 @@ procedure comm_put (                   {add new comment to comments state}
 
 begin
 
-  {*** NOT REALLY IMPLEMENTED YET ***}
+  {*** NOT IMPLEMENTED YET, temporary code ***}
 
   case level of
 mcomp_cmlev_eol_k: begin               {end of line comment}
@@ -101,4 +102,19 @@ begin
         end
       ;
     end;                               {back for next input stream character}
+  end;
+{
+********************************************************************************
+*
+*   Subroutine MCOMP_COMM_NEWLINE
+*
+*   Indicate to the comment system that parsing is now on a new line.
+}
+procedure mcomp_comm_newline;          {tell comment system now on new line}
+  val_param;
+
+begin
+
+  {*** NOT IMPLEMENTED YET ***}
+
   end;
