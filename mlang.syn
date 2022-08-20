@@ -54,13 +54,13 @@
 
 .define statement .as
   stlevel                              /* skip over indentation, get nesting level
-  (
-    ("memory" space memory_[1]) .or
-    ("memregion" space memregion_[2]) .or
-    ("address" space address_[3]) .or
-    ("adrregion" space adrregion_[4]) .or
-    ("set" space set_[5]) .or
-    set_[5]
+  .eod[1] .or (
+    ("memory" space memory_[2]) .or
+    ("memregion" space memregion_[3]) .or
+    ("address" space address_[4]) .or
+    ("adrregion" space adrregion_[5]) .or
+    ("set" space set_[6]) .or
+    set_[6]
     )
   pad .eol
 /*

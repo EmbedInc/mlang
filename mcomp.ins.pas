@@ -12,10 +12,6 @@
 
 const
   {
-  *   Special values for NEXTLEVEL.  Normal nesting levels are 0-N.
-  }
-  mcomp_nxlev_eod_k = -1;              {reached end of data}
-  {
   *   Special values for comment levels.  Normal nesting levels are 0-N.
   }
   mcomp_cmlev_eol_k = -1;              {end of line comment}
@@ -25,7 +21,7 @@ var (mcomp_com)
   syn_p: syn_p_t;                      {SYN library use state}
   code_p: code_p_t;                    {CODE library use state}
   currlevel: sys_int_machine_t;        {current block nesting level, 0 = top}
-  nextlevel: sys_int_machine_t;        {lev of next statement, 1-N or MCOMP_LEV_xxx_K}
+  nextlevel: sys_int_machine_t;        {lev of next statement}
   errsyn: boolean;                     {syntax error, doing error reparse}
 {
 *   Routines.

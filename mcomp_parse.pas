@@ -44,15 +44,13 @@ begin
     errsyn := not syn_parse_next (     {parse statement, build syntax tree}
       syn_p^,                          {SYN library use state}
       addr(mcomp_syn_statement));      {top level parsing routine}
-
-    if nextlevel = mcomp_nxlev_eod_k then exit; {hit global end on input ?}
-
     if errsyn then begin               {syntax error ?}
       syn_parse_err_reparse (syn_p^);  {build syntax tree up to error}
       end;
 
     syn_trav_init (syn_p^);            {init for traversing the syntax tree}
     mcomp_syts_statement;              {process syntax tree for STATEMENT}
+    if syn_parse_end(syn_p^) then exit; {hit end of input ?}
     end;                               {back to do next statement}
 {
 *   Clean up and leave.

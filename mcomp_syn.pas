@@ -105,7 +105,7 @@ begin
 
     commallow := c = ord(' ');         {comment start allowed next char ?}
 
-    if c = ord(' ') then begin         {space ?}
+    if (c = ord(' ')) or (c = syn_ichar_eof_k) then begin {separator ?}
       skip := true;                    {found separator}
       next;                            {on to next character}
       end;
