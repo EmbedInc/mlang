@@ -10,7 +10,7 @@
 
 <h1 class=page>The M Computer Language
   <br>Memory Model</h1>
-<p class=page>Last updated 17 July 2021</p>
+<p class=page>Last updated 21 Aug 2022</p>
 
 
 <p>The M model of the underlying machine's memory architecture consists of
@@ -119,18 +119,13 @@ particular target machine.&nbsp;
 
     </p></indent>
 
-  <p><tt><b>access</b> [-]<i>accesstype</i></tt></p><indent>
+  <p><tt><b>access</b> [-]<i>accesstype</i> ... [-]<i>accesstype</i></tt></p><indent>
 
-    <p>Specifies one kind of access that the processor has to this memory
+    <p>Specifies what kind of access that the processor has to this memory
     available to a program at run time.&nbsp;  Without the optional "-"
     before <tt><i>accesstype</i></tt>, the access type is indicated to be
     available to the processor.&nbsp;  With the "-", the access type is
-    indicated to not be available to the processor.&nbsp;  Access types
-    not mentioned in any <tt><b>access</b></tt> parameter inherit the
-    default setting.&nbsp;  At the top level, the default for all access
-    types is that they are not available.&nbsp;  This means that any
-    access that a memory supports must be explicitly mentioned in the
-    source code at least once for that memory.&nbsp;
+    indicated to not be available to the processor.&nbsp;
 
     <p>The <tt><i>accesstype</i></tt> keywords are:</p><indent>
 
@@ -160,10 +155,20 @@ particular target machine.&nbsp;
 
         </p></indent>
 
+      <p><tt><b>inherit</b></tt></p><indent>
+
+        <p>Set all accesses to that of the parent.  This
+        <tt><i>accesstype</i></tt> is not valid for top level memory
+        structure commands, like <tt><b>memory</b></tt> or
+        <tt><b>adrspace</b></tt>.  Subsequent <tt><i>accesstype</i></tt>
+        parameters can modify the inherited accesses.
+
+        </p></indent>
+
       </p></indent>
 
-    <p>There may be any number of <tt><b>access</b></tt> parameters.&nbsp;
-    Later <tt><b>access</b></tt> parameters override earlier ones in case
+    <p>There may be any number of <tt><i>accesstype</i></tt> parameters.&nbsp;
+    Later <tt><i>accesstype</i></tt> parameters override earlier ones in case
     of conflict.&nbsp;
 
     </p></indent>
@@ -244,7 +249,7 @@ particular target machine.&nbsp;
   </p></indent>
 
 
-<h2 id="address statement"><tt><b>address</b> <i>name</i> <i>parameter</i>
+<h2 id="adrspace statement"><tt><b>adrspace</b> <i>name</i> <i>parameter</i>
 ... <i>parameter</i></tt></h2><indent>
 
   <p>Defines one logical address space.&nbsp;  The symbol

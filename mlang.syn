@@ -13,7 +13,7 @@
 
 .symbol memory_
 .symbol memregion_
-.symbol address_
+.symbol adrspace_
 .symbol adrregion_
 .symbol set_
 
@@ -47,17 +47,21 @@
   integer[1]                           /* temp placeholder
 
 .define accesstype .as
-  .optional "-"[1]
-  "read"[2] .or
-  "write"[3] .or
-  "execute"[4]
+  .occurs[1 to inf] (
+    space
+    .optional "-"[1]
+    "read"[2] .or
+    "write"[3] .or
+    "execute"[4] .or
+    "inherit"[5]
+    )
 
 .define statement .as
   stlevel                              /* skip over indentation, get nesting level
   .eod[1] .or (
     ("memory" space memory_[2]) .or
     ("memregion" space memregion_[3]) .or
-    ("address" space address_[4]) .or
+    ("adrspace" space adrspace_[4]) .or
     ("adrregion" space adrregion_[5]) .or
     ("set" space set_[6]) .or
     set_[6]
@@ -73,7 +77,7 @@
     space
     ("adrbits" space integer[1]) .or
     ("datbits" space integer[2]) .or
-    ("access" space accesstype[3])
+    ("access" accesstype[3])
     )
 
 .define memregion_ .as
@@ -83,16 +87,16 @@
     ("startadr" space integer[1]) .or
     ("length" space integer[2]) .or
     ("endadr" space integer[3]) .or
-    ("access" space accesstype[4])
+    ("access" accesstype[4])
     )
 
-.define address_ .as
+.define adrspace_ .as
   name[1]
   .occurs[0 to inf] (
     space
     ("adrbits" space integer[1]) .or
     ("datbits" space integer[2]) .or
-    ("access" space accesstype[3])
+    ("access" accesstype[3])
     )
 
 .define adrregion_ .as
