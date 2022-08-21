@@ -55,6 +55,11 @@ begin
       writeln;
       end;
 
+    if errsyn then begin               {syntax error ?}
+      syn_parse_err_show (syn_p^);     {show syntax error location}
+      writeln;
+      end;
+
     mcomp_syt_statement;               {process syntax tree for STATEMENT}
     if errsyn then exit;               {don't continue after error}
     if syn_parse_end(syn_p^) then exit; {hit end of input ?}
