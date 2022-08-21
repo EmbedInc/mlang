@@ -23,6 +23,7 @@ var (mcomp_com)
   currlevel: sys_int_machine_t;        {current block nesting level, 0 = top}
   nextlevel: sys_int_machine_t;        {lev of next statement}
   errsyn: boolean;                     {syntax error, doing error reparse}
+  show_tree: boolean;                  {show syntax tree each statement, for debuggin}
 {
 *   Routines.
 }

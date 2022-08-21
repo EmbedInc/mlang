@@ -38,6 +38,8 @@ begin
   iname_set := false;                  {no input file name specified}
   pre_only := false;                   {init to do full compile}
   showver := false;                    {init to not show program version}
+
+  show_tree := false;                  {init to not show syn tree each statement}
 {
 *   Back here each new command line option.
 }
@@ -56,7 +58,7 @@ next_opt:
     end;
   string_upcase (opt);                 {make upper case for matching list}
   string_tkpick80 (opt,                {pick command line option name from list}
-    '-IN -PRE -V',
+    '-IN -PRE -V -TREE',
     pick);                             {number of keyword picked from list}
   case pick of                         {do routine for specific option}
 {
@@ -82,6 +84,12 @@ next_opt:
 }
 3: begin
   showver := true;                     {show program version}
+  end;
+{
+*   -TREE
+}
+4: begin
+  show_tree := true;                   {show syntax tree each statement}
   end;
 {
 *   Unrecognized command line option.

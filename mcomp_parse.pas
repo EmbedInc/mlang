@@ -49,9 +49,11 @@ begin
       end;
 
     syn_trav_init (syn_p^);            {init for traversing the syntax tree}
-    writeln;
-    syn_dbg_tree_show (syn_p^);        {show the syntax tree}
-    writeln;
+    if show_tree then begin            {show the syntax tree ?}
+      writeln;
+      syn_dbg_tree_show (syn_p^);      {show the tree of this statement}
+      writeln;
+      end;
 
     mcomp_syt_statement;               {process syntax tree for STATEMENT}
     if errsyn then exit;               {don't continue after error}
