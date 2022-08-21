@@ -7,30 +7,40 @@ define mcomp_comm_newline;
 {
 ********************************************************************************
 *
-*   Local subroutine COMM_PUT (COMM, LEVEL)
+*   Local subroutine COMM_PUT (COMM, LEVEL, POS)
 *
 *   Update the comments state with the new comment string COMM.  LEVEL is the
 *   nesting level of the new comment, or one of the special cases
-*   MCOMP_CMLEV_xxx_K.
+*   MCOMP_CMLEV_xxx_K.  POS is the character position of the start of the
+*   comment.  Each comment is uniquely identified with a different POS.
 }
 procedure comm_put (                   {add new comment to comments state}
   in      comm: univ string_var_arg_t; {comment string}
-  in      level: sys_int_machine_t);   {nesting level or MCOMP_CMLEV_xxx_K}
+  in      level: sys_int_machine_t;    {nesting level or MCOMP_CMLEV_xxx_K}
+  in      pos: fline_cpos_t);          {input stream position at start of comment}
   val_param; internal;
+
+var
+  lnum: sys_int_machine_t;             {line number}
 
 begin
 
   {*** NOT IMPLEMENTED YET, temporary code ***}
 
+  lnum := 0;
+  if pos.line_p <> nil then begin
+    lnum := pos.line_p^.lnum;
+    end;
+  write ('Comm on line ', lnum, ' col ', pos.ind, ' ');
   case level of
 mcomp_cmlev_eol_k: begin               {end of line comment}
-      writeln ('EOL comm: ', comm.str:comm.len);
+      writeln ('EOL: ', comm.str:comm.len);
       end;
 mcomp_cmlev_blank_k: begin             {blank line}
       writeln ('Blank line');
       end;
 otherwise
-    writeln ('Comm lev ', level:2, ': ', comm.str:comm.len);
+    writeln ('lev ', level:2, ': ', comm.str:comm.len);
     end;
   end;
 {
@@ -66,11 +76,14 @@ procedure mcomp_comm_get (             {read comment to end of line, consumes EO
 var
   comm: string_var132_t;               {comment content}
   c: sys_int_machine_t;                {character code of current charcter}
-  pos: fline_cpos_t;                   {saved parsing position}
+  poscomm: fline_cpos_t;               {position at comment start}
+  pos: fline_cpos_t;                   {temp saved parsing position}
   noblank: boolean;                    {ignoring leading blanks}
 
 begin
   comm.max := size_char(comm.str);     {init local var string}
+
+  syn_p_cpos_get (syn, poscomm);       {save position at comment start}
 
   comm.len := 0;                       {init comment string to empty}
   noblank := level < 0;                {ignore leading blanks unless explicit comment line}
@@ -86,7 +99,7 @@ begin
         syn_p_cpos_set (syn, pos);
         end;
       string_unpad (comm);             {remove trailing blanks from comment string}
-      comm_put (comm, level);          {update comment state with this new comment}
+      comm_put (comm, level, poscomm); {update comment state with this new comment}
       return;
       end;
 
