@@ -33,9 +33,6 @@ procedure mcomp_comm_get (             {read comment to end of line}
   in      noeol: boolean);             {consume EOL at end of comment}
   val_param; extern;
 
-procedure mcomp_comm_newline;          {tell comment system now on new line}
-  val_param; extern;
-
 procedure mcomp_dbg_coll (             {show contents of a collection}
   in      coll: fline_coll_t);         {the collection to show}
   val_param; extern;

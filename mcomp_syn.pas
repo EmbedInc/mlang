@@ -35,8 +35,6 @@ label
 
 begin
 next_line:                             {back here to retry on next line}
-  mcomp_comm_newline;                  {tell comment system we are now on new line}
-
   indent := 0;                         {init number spaces indentation found}
   while true do begin
     syn_p_cpos_get (syn, pos);         {save parsing postion before this new char}
@@ -48,8 +46,11 @@ next_line:                             {back here to retry on next line}
 *   C is the first non-blank character found, and POS is its parsing position.
 *   INDENT is the number of spaces preceeding C on the line.
 }
+  if c = syn_ichar_eod_k then return;  {hit end of all data ?}
+
   if c = syn_ichar_eol_k then begin    {special case of all-blank line ?}
-    mcomp_comm_get (syn, mcomp_cmlev_blank_k, false); {notify of blank line comment}
+    syn_p_cpos_set (syn, pos);         {restore position to start of comment}
+    mcomp_comm_get (syn, mcomp_cmlev_blank_k, true); {notify of blank line comment}
     goto next_line;                    {skip this line, on to next}
     end;
 

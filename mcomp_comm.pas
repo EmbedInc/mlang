@@ -2,7 +2,6 @@
 }
 module mcomp_comm;
 define mcomp_comm_get;
-define mcomp_comm_newline;
 %include 'mcomp.ins.pas';
 {
 ********************************************************************************
@@ -31,7 +30,7 @@ begin
   if pos.line_p <> nil then begin
     lnum := pos.line_p^.lnum;
     end;
-  write ('Comm on line ', lnum, ' col ', pos.ind, ' ');
+  write ('Comm on line ', lnum, ' col ', pos.ind, ', ');
   case level of
 mcomp_cmlev_eol_k: begin               {end of line comment}
       writeln ('EOL: ', comm.str:comm.len);
@@ -84,7 +83,6 @@ begin
   comm.max := size_char(comm.str);     {init local var string}
 
   syn_p_cpos_get (syn, poscomm);       {save position at comment start}
-
   comm.len := 0;                       {init comment string to empty}
   noblank := level < 0;                {ignore leading blanks unless explicit comment line}
 
@@ -115,19 +113,4 @@ begin
         end
       ;
     end;                               {back for next input stream character}
-  end;
-{
-********************************************************************************
-*
-*   Subroutine MCOMP_COMM_NEWLINE
-*
-*   Indicate to the comment system that parsing is now on a new line.
-}
-procedure mcomp_comm_newline;          {tell comment system now on new line}
-  val_param;
-
-begin
-
-  {*** NOT IMPLEMENTED YET ***}
-
   end;
