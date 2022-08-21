@@ -55,6 +55,7 @@ next_line:                             {back here to retry on next line}
 
   nextlevel := indent div 2;           {make nesting level from indentation}
   if (nextlevel * 2) <> indent then begin {invalid indentation ?}
+    syn_p_cpos_set (syn, pos);         {position to offending character}
     sys_msg_parm_int (msg_parm[1], indent);
     mcomp_err_atline ('mcomp_prog', 'indent_bad', msg_parm, 1);
     end;

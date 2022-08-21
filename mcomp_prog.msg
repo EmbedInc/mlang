@@ -2,4 +2,5 @@
 //
 msg indent_bad
   lan english -def
-    Invalid indentation of %p1i found.  Indentation must be even number of blanks.
+    Invalid indentation of %p1i found.  Indentation must be an even number
+    of blanks.
