@@ -54,6 +54,7 @@ begin
     writeln;
 
     mcomp_syt_statement;               {process syntax tree for STATEMENT}
+    if errsyn then exit;               {don't continue after error}
     if syn_parse_end(syn_p^) then exit; {hit end of input ?}
     end;                               {back to do next statement}
 {
