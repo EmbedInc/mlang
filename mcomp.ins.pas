@@ -16,8 +16,10 @@ const
   }
   mcomp_cmlev_eol_k = -1;              {end of line comment}
   mcomp_cmlev_blank_k = -2;            {blank line, no comment start char}
+  mcomp_cmlev_none_k = -3;             {no comment defined}
 
 var (mcomp_com)
+  mem_p: util_mem_context_p_t;         {mem context for this run of program}
   syn_p: syn_p_t;                      {SYN library use state}
   code_p: code_p_t;                    {CODE library use state}
   currlevel: sys_int_machine_t;        {current block nesting level, 0 = top}
@@ -33,6 +35,10 @@ procedure mcomp_comm_get (             {read comment to end of line}
   in      noeol: boolean);             {consume EOL at end of comment}
   val_param; extern;
 
+procedure mcomp_comm_init (            {init comments system}
+  in      coll: fline_coll_t);         {collection of lines that will be parsed}
+  val_param; extern;
+
 procedure mcomp_dbg_coll (             {show contents of a collection}
   in      coll: fline_coll_t);         {the collection to show}
   val_param; extern;
@@ -43,6 +49,11 @@ procedure mcomp_err_atline (           {show error, source line, and bomb progra
   in      parms: univ sys_parm_msg_ar_t; {array of parameter descriptors}
   in      n_parms: sys_int_machine_t); {number of parameters in PARMS}
   options (val_param, extern, noreturn);
+
+procedure mcomp_mem_perm (             {get new memory, can't deallocate later}
+  in      size: sys_int_adr_t;         {min size of new memory, bytes}
+  out     new_p: univ_ptr);            {returned pointer to the new memory}
+  val_param; extern;
 
 procedure mcomp_parse (                {parse input, build in-memory structures}
   in var  coll: fline_coll_t;          {collection of text lines to parse}

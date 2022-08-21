@@ -119,10 +119,14 @@ done_opts:                             {done with all the command line options}
     sys_message_bomb ('string', 'cmline_input_fnam_missing', nil, 0);
     end;
 {
+*   Init the global variables.
+}
+  util_mem_context_get (util_top_mem_context, mem_p); {create our mem context}
+{
 *   Configure the ESCR scripting system for our use.
 }
   escr_open (                          {create new use of the ESCR scripting system}
-    util_top_mem_context,              {parent memory context, will make subordinate}
+    mem_p^,                            {parent memory context, will make subordinate}
     e_p,                               {returned pointer to script system state}
     stat);
   sys_error_abort (stat, 'escr', 'open', nil, 0);
@@ -190,17 +194,14 @@ done_opts:                             {done with all the command line options}
     mcomp_dbg_coll (coll_p^);          {show the data in the postprocessed collection}
     goto abort1;
     end;
+
+  mcomp_comm_init (coll_p^);           {init comment system}
 {
 *   Parse the pre-processed result and build the in-memory structures
 *   representing the code.
 }
   mcomp_parse (coll_p^, stat);         {parse the pre-processed collection of lines}
   sys_error_abort (stat, '', '', nil, 0);
-
-
-
-
-
 
 abort1:                                {jump here to leave with FLINE library open}
   fline_lib_end (fl_p);                {end this use of the FLINE library}

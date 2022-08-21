@@ -1,8 +1,66 @@
 {   Comment handling.
 }
 module mcomp_comm;
+define mcomp_comm_init;
 define mcomp_comm_get;
 %include 'mcomp.ins.pas';
+{
+*   Since there can be at most one comment per source line, each comment is
+*   uniquely identified by the source line number.  The COMMLINE array contains
+*   one entry for each source line.
+*
+*   The syntax parser can attempt to parse over the same source code multiple
+*   times.  This can result in MCOMP_COMM_GET getting called with the same
+*   comment multiple times.  The COMMLINE array is the means to identify and
+*   ignore redundant comments being provided to the comments system.
+}
+type
+  commline_ent_t = record
+    cmlev: sys_int_machine_t;          {0-N nesting level or MCOMP_CMLEV_xxx_K}
+    str_p: string_var_p_t;             {pointer to comment string, NIL when none}
+    end;
+
+  commline_p_t = ^commline_t;
+  commline_t =                         {array template, sized for num of input lines}
+    array[1..1] of commline_ent_t;
+
+var
+  commline_p: commline_p_t;            {pointer to array of comments by source line}
+  nlines: sys_int_machine_t;           {number of lines in COMMLINE array}
+{
+********************************************************************************
+*
+*   Subroutine MCOMP_COMM_INIT (COLL)
+*
+*   Initialize the comment system to the collection of lines that will be
+*   parsed.  This must be the first call into this module.  All subsequent
+*   comments must be from this collection.
+}
+procedure mcomp_comm_init (            {init comments system}
+  in      coll: fline_coll_t);         {collection of lines that will be parsed}
+  val_param;
+
+var
+  line: sys_int_machine_t;             {line number}
+
+begin
+  if coll.last_p = nil
+    then begin                         {no input lines}
+      nlines := 1;                     {set to minimum}
+      end
+    else begin                         {there is a known last input line}
+      nlines := coll.last_p^.lnum;     {init size to number of lines}
+      end
+    ;
+  mcomp_mem_perm (                     {allocate memory for comment lines array}
+    sizeof(commline_ent_t) * nlines,   {amount of memory to allocate}
+    commline_p);                       {returned pointer to the new memory}
+
+  for line := 1 to nlines do begin     {init the comment lines array}
+    commline_p^[line].cmlev := mcomp_cmlev_none_k; {init to no comm from this line}
+    commline_p^[line].str_p := nil;
+    end;
+  end;
 {
 ********************************************************************************
 *
@@ -23,13 +81,24 @@ var
   lnum: sys_int_machine_t;             {line number}
 
 begin
+  if pos.line_p = nil then return;     {source line is unknown (shouldn't happen) ?}
+  lnum := pos.line_p^.lnum;            {get the source line number}
+  if (lnum < 0) or (lnum > nlines) then return; {out of range of comm lines array ?}
+
+  if commline_p^[lnum].str_p <> nil then return; {already know about this comment ?}
+
+  commline_p^[lnum].cmlev := level;    {save info about comment from this line}
+  string_alloc (                       {allocate memory for the comment string}
+    comm.len,                          {max length of string to allocate}
+    mem_p^,                            {parent memory context}
+    false,                             {won't individually deallocate this mem}
+    commline_p^[lnum].str_p);          {returned pointer to the new empty}
+  string_copy (comm, commline_p^[lnum].str_p^); {save comm text in new string}
+
 
   {*** NOT IMPLEMENTED YET, temporary code ***}
 
-  lnum := 0;
-  if pos.line_p <> nil then begin
-    lnum := pos.line_p^.lnum;
-    end;
+
   write ('Comm on line ', lnum, ' col ', pos.ind, ', ');
   case level of
 mcomp_cmlev_eol_k: begin               {end of line comment}

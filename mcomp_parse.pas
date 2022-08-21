@@ -24,12 +24,13 @@ begin
 {
 *   Set up the SYN library for parsing each statement.
 }
-  syn_lib_new (util_top_mem_context, syn_p); {start new use of the SYN library}
+  syn_lib_new (mem_p^, syn_p);         {start new use of the SYN library}
   syn_parse_pos_coll (syn_p^, coll);   {set parse position to start of input}
 {
 *   Set up the CODE library for maintaining the description of the parsed code.
 }
   code_lib_def (inicfg);               {init CODE config parameters to default}
+  inicfg.mem_p := mem_p;               {use our mem context as parent}
   inicfg.memnam_len := 32;             {max length of mem and adr space names}
   inicfg.symlen_max := 32;             {max length of other symbols}
 

@@ -8,6 +8,7 @@ call src_pas %srcdir% mcomp
 call src_pas %srcdir% mcomp_comm
 call src_pas %srcdir% mcomp_dbg
 call src_pas %srcdir% mcomp_err
+call src_pas %srcdir% mcomp_mem
 call src_pas %srcdir% mcomp_parse
 call src_pas %srcdir% mcomp_syn
 call src_pas %srcdir% mcomp_syt
