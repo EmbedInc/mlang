@@ -46,7 +46,10 @@ next_line:                             {back here to retry on next line}
 *   C is the first non-blank character found, and POS is its parsing position.
 *   INDENT is the number of spaces preceeding C on the line.
 }
-  if c = syn_ichar_eod_k then return;  {hit end of all data ?}
+  if c = syn_ichar_eod_k then begin    {hit end of all data ?}
+    nextlevel := 0;                    {treat EOD as top level statement, never continuation}
+    return;
+    end;
 
   if c = syn_ichar_eol_k then begin    {special case of all-blank line ?}
     syn_p_cpos_set (syn, pos);         {restore position to start of comment}
@@ -117,7 +120,6 @@ begin
     *   This char is EOL.  POS is the position of this EOL.
     }
     find_indent (syn);                 {set NEXTLEVEL to indentation level of new line}
-    if nextlevel < 0 then exit;        {special condition, not normal next line ?}
 
     if nextlevel = (currlevel + 2) then begin {new line is continuation of previous ?}
       skip := true;                    {new line counts as separator}
