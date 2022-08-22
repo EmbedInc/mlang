@@ -79,14 +79,19 @@ procedure comm_put (                   {add new comment to comments state}
 
 var
   lnum: sys_int_machine_t;             {line number}
+  p: fline_cpos_t;                     {position of actual comment start}
+  comm_p: code_comm_p_t;               {pointer to comment descriptor}
 
 begin
   if pos.line_p = nil then return;     {source line is unknown (shouldn't happen) ?}
   lnum := pos.line_p^.lnum;            {get the source line number}
   if (lnum < 0) or (lnum > nlines) then return; {out of range of comm lines array ?}
-
   if commline_p^[lnum].str_p <> nil then return; {already know about this comment ?}
-
+{
+*   This is a new comment we haven't previously added to the system.
+*
+*   Upate the comment lines array.
+}
   commline_p^[lnum].cmlev := level;    {save info about comment from this line}
   string_alloc (                       {allocate memory for the comment string}
     comm.len,                          {max length of string to allocate}
@@ -94,22 +99,51 @@ begin
     false,                             {won't individually deallocate this mem}
     commline_p^[lnum].str_p);          {returned pointer to the new empty}
   string_copy (comm, commline_p^[lnum].str_p^); {save comm text in new string}
+{
+*   Make the actual comment start position in P.  POS is the start of the
+*   comment string.  In the comments data we want the actual comment start,
+*   which is the leading "'" character in some cases.
+}
+  p := pos;                            {init actual start to passed-in position}
 
-
-  {*** NOT IMPLEMENTED YET, temporary code ***}
-
-
-  write ('Comm on line ', lnum, ' col ', pos.ind, ', ');
-  case level of
-mcomp_cmlev_eol_k: begin               {end of line comment}
-      writeln ('EOL: ', comm.str:comm.len);
-      end;
-mcomp_cmlev_blank_k: begin             {blank line}
-      writeln ('Blank line');
-      end;
-otherwise
-    writeln ('lev ', level:2, ': ', comm.str:comm.len);
+  if (level >= 0) or (level = mcomp_cmlev_eol_k) then begin {starts with "'" ?}
+    p.ind := p.ind - 1;                {go back on character to the "'"}
     end;
+{
+*   Handle block comment line.
+}
+  if level >= 0 then begin             {part of a block comment ?}
+    code_comm_new_block (              {tell system of new block comment line}
+      code_p^,                         {CODE library use state}
+      commline_p^[lnum].str_p,         {pointer to comment line text}
+      p,                               {comment start position in source code}
+      lnum,                            {sequential line number}
+      level,                           {0-N nesting level}
+      comm_p);                         {returned pointer to comment descriptor}
+    return;
+    end;
+{
+*   Handle end of line comment.
+}
+  if level = mcomp_cmlev_eol_k then begin {this is an end of line comment ?}
+    code_comm_new_eol (                {tell system of new end of line comment}
+      code_p^,                         {CODE library use state}
+      commline_p^[lnum].str_p,         {pointer to comment line text}
+      p,                               {comment start position in source code}
+      lnum,                            {sequential line number}
+      comm_p);                         {returned pointer to comment descriptor}
+    return;
+    end;
+{
+*   Handle blank line.  A blank line immediately after a block comment indicates
+*   to keep the comment in the hierarchy for that level.  In other words, that
+*   comment still applies to everything at its level, even if there is a later
+*   block comment of the same level.
+}
+  code_comm_keep (                     {keep previous block comment, if applies}
+    code_p^,                           {CODE library use state}
+    lnum,                              {sequential line number}
+    comm_p);                           {returned pointer to comment descriptor}
   end;
 {
 ********************************************************************************
