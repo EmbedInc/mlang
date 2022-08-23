@@ -39,6 +39,10 @@ procedure mcomp_comm_init (            {init comments system}
   in      coll: fline_coll_t);         {collection of lines that will be parsed}
   val_param; extern;
 
+function mcomp_currline                {get line number of current syntax tree position}
+  :sys_int_machine_t;
+  val_param; extern;
+
 procedure mcomp_dbg_coll (             {show contents of a collection}
   in      coll: fline_coll_t);         {the collection to show}
   val_param; extern;
@@ -65,5 +69,17 @@ function mcomp_syn_statement (         {parse one top level statement}
   :boolean;
   val_param; extern;
 
-procedure mcomp_syt_statement;         {interpret STATEMENT}
+procedure mcomp_syt_accesstype (       {interpret ACCESSTYPE syntax}
+  in out  attr: code_memattr_t;        {attributes to update}
+  in      parent: code_memattr_t);     {parent code attributes}
+  val_param; extern;
+
+function mcomp_syt_integer             {interpret INTEGER syntax}
+  :sys_int_max_t;
+  val_param; extern;
+
+procedure mcomp_syt_memory_;           {interpret MEMORY_ syntax}
+  val_param; extern;
+
+procedure mcomp_syt_statement;         {interpret STATEMENT syntax}
   val_param; extern;

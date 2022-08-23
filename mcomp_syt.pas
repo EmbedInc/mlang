@@ -14,8 +14,138 @@
 *   so.
 }
 module mcomp_syt;
+define mcomp_syt_integer;
+define mcomp_syt_accesstype;
 define mcomp_syt_statement;
+define mcomp_syt_memory_;
 %include 'mcomp.ins.pas';
+{
+********************************************************************************
+*
+*   Function MCOMP_CURRLINE
+*
+*   Returns the globally unique source line number for the current syntax tree
+*   position.
+}
+function mcomp_currline                {get line number of current syntax tree position}
+  :sys_int_machine_t;
+  val_param;
+
+var
+  pos: fline_cpos_t;                   {input stream position}
+
+begin
+  mcomp_currline := 0;                 {init return value to unknown line}
+
+  syn_trav_pos (syn_p^, pos);          {get position for current syntax tree entry}
+
+  if pos.line_p = nil then return;     {no source line indicated ?}
+  mcomp_currline := pos.line_p^.lnum;  {return the globally unique line number}
+  end;
+{
+********************************************************************************
+*
+*   Function MCOMP_SYT_INTEGER
+*
+*   Interpret the INTEGER syntax and return the resulting value.
+}
+function mcomp_syt_integer             {interpret INTEGER syntax}
+  :sys_int_max_t;
+  val_param;
+
+var
+  tk: string_var32_t;                  {integer token}
+  ii: sys_int_max_t;                   {the integer value}
+  stat: sys_err_t;
+
+begin
+  tk.max := size_char(tk.str);         {init local var string}
+
+  syn_trav_tag_string (syn_p^, tk);    {get the integer string}
+  string_t_int_max (tk, ii, stat);     {convert string to integer}
+  syn_error_bomb (syn_p^, stat, '', '', nil, 0);
+  mcomp_syt_integer := ii;             {pass back the integer value}
+  end;
+{
+********************************************************************************
+*
+*   Subroutine MCOMP_SYT_ACCESSTYPE (ATTR, PARENT)
+*
+*   Interpret the ACCESSTYPE syntax.  ATTR is the attributes to modify.  PARENT
+*   are the parent attributes.
+}
+procedure mcomp_syt_accesstype (       {interpret ACCESSTYPE syntax}
+  in out  attr: code_memattr_t;        {attributes to update}
+  in      parent: code_memattr_t);     {parent code attributes}
+  val_param;
+
+var
+  tag: sys_int_machine_t;              {syntax tag ID}
+  remove: boolean;                     {removed the access instead of adding it}
+  accnew: code_memattr_t;              {accesses to add or remove}
+  acc: code_memattr_t;                 {scratch accesses}
+
+begin
+  if not syn_trav_next_down (syn_p^) then begin {down into ACCESSTYPE syntax}
+    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'accty_err', nil, 0);
+    end;
+
+  attr := [];                          {init to no access types}
+  while true do begin                  {loop thru the options}
+    tag := syn_trav_next_tag (syn_p^); {get tag for this option}
+    accnew := [];                      {init to no accesses being added or removed}
+    case tag of                        {which option is it ?}
+
+syn_tag_end_k: begin                   {end of options}
+        discard( syn_trav_up (syn_p^) ); {back up to parent level}
+        return;
+        end;
+
+1:    begin                            {no "-"}
+        remove := false;
+        end;
+
+2:    begin                            {"-"}
+        remove := true;
+        end;
+
+3:    begin                            {READ}
+        accnew := [code_memattr_rd_k];
+        end;
+
+4:    begin                            {WRITE}
+        accnew := [code_memattr_wr_k];
+        end;
+
+5:    begin                            {EXECUTE}
+        accnew := [code_memattr_ex_k];
+        end;
+
+6:    begin                            {INHERIT}
+        accnew := parent;
+        end;
+
+otherwise                              {unexpected tag}
+      syn_msg_tag_bomb (syn_p^, 'mcomp_prog', 'accty_err', nil, 0);
+      end;                             {end of tag cases}
+
+    if not remove then begin           {adding accesses, not removing them ?}
+      acc := accnew - parent;          {access trying to add but not in parent}
+      if not (acc = []) then begin     {tring to add unavailable access}
+        syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'accty_npar', nil, 0); {bomb with error}
+        end;
+      end;
+
+    if remove
+      then begin                       {remove the new accesses in ACCNEW}
+        attr := attr - accnew;
+        end
+      else begin                       {add the new accesses in ACCNEW}
+        attr := attr + accnew;
+        end
+      ;
+    end;                               {back to get next command option}
+  end;
 {
 ********************************************************************************
 *
@@ -30,30 +160,98 @@ var
   tag: sys_int_machine_t;              {syntax tag ID}
 
 begin
-
-  {*** NOT IMPLEMENTED YET, temp code ***}
-
   if not syn_trav_next_down (syn_p^) then begin {down into STATEMENT}
     syn_msg_pos_bomb (syn_p^, '', '', nil, 0);
     end;
 
   tag := syn_trav_next_tag(syn_p^);    {get first mandatory tag}
-  write ('Tag ', tag, ': ');
-  case tag of
-syn_tag_end_k: write ('END');
-syn_tag_err_k: write ('ERR');
-syn_tag_sub_k: write ('SUB');
-syn_tag_lev_k: write ('LEV');
-1:  write ('EOD');
-2:  write ('memory');
-3:  write ('address');
-4:  write ('address');
-5:  write ('adrregion');
-6:  write ('set');
-otherwise
-    write ('-- unknown --');
+  case tag of                          {what kind of statement ?}
+1:  begin                              {end of data}
+      return;
+      end;
+2:  begin                              {MEMORY}
+      mcomp_syt_memory_;
+      end;
+3:  begin                              {MEMREGION}
+      end;
+4:  begin                              {ADRSPACE}
+      end;
+5:  begin                              {ADRREGION}
+      end;
+6:  begin                              {SET (assignment)}
+      end;
+otherwise                              {unexpected tag}
+    syn_msg_tag_bomb (syn_p^, 'mcomp_prog', 'statement_bad', nil, 0);
     end;
-  writeln;
 
   discard( syn_trav_up (syn_p^) );     {back up to parent level}
+  end;
+{
+********************************************************************************
+*
+*   Subroutine MCOMP_SYT_MEMORY_
+*
+*   Interpret the MEMORY_ syntax.
+}
+procedure mcomp_syt_memory_;           {interpret MEMORY_ syntax}
+  val_param;
+
+var
+  tag: sys_int_machine_t;              {syntax tag ID}
+  name: string_var32_t;                {memory name}
+  mem_p: code_memory_p_t;              {pointer to the new memory descriptor}
+  stat: sys_err_t;
+
+begin
+  name.max := size_char(name.str);     {init local var string}
+
+  if not syn_trav_next_down (syn_p^) then begin {down into MEMORY_ syntax}
+    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'mem_err', nil, 0);
+    end;
+{
+*   Create and initialize the memory descriptor.
+}
+  tag := syn_trav_next_tag (syn_p^);   {get tag for memory name}
+  if tag <> 1 then begin
+    syn_msg_tag_bomb (syn_p^, 'mcomp_prog', 'mem_name_none', nil, 0);
+    end;
+  syn_trav_tag_string (syn_p^, name);  {get the new memory name}
+  code_mem_new (code_p^, name, mem_p, stat); {create the new memory descriptor}
+  syn_error_bomb (syn_p^, stat, 'mcomp_prog', 'mem_err', nil, 0);
+  syn_trav_tag_start (syn_p^, mem_p^.sym_p^.pos); {save source code position}
+  code_comm_find (                     {tag the new structure with comment, if any}
+    code_p^,                           {CODE library use state}
+    mcomp_currline,                    {current global sequential source line number}
+    currlevel,                         {current nesting level}
+    mem_p^.sym_p^.comm_p);             {returned pointer to comments}
+{
+*   Process the command options.
+}
+  while true do begin                  {loop thru optional parameters}
+    tag := syn_trav_next_tag (syn_p^); {get tag for next option}
+    case tag of                        {which option is it ?}
+
+syn_tag_end_k: begin                   {end of options}
+        discard( syn_trav_up (syn_p^) ); {back up to parent level}
+        return;
+        end;
+
+1:    begin                            {ADRBITS}
+        mem_p^.bitsadr := mcomp_syt_integer;
+        end;
+
+2:    begin                            {DATBITS}
+        mem_p^.bitsdat := mcomp_syt_integer;
+        end;
+
+3:    begin                            {ACCESS}
+        mcomp_syt_accesstype (         {interpret the ACCESSTYPE syntax}
+          mem_p^.attr,                 {access type to update}
+          ~setof(code_memattr_t));     {parent access types, all for top level}
+        end;
+
+otherwise                              {unexpected tag}
+      syn_msg_tag_bomb (syn_p^, 'mcomp_prog', 'mem_opt_bad', nil, 0);
+      end;
+    end;                               {back to get next command option}
   end;

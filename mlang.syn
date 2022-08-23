@@ -49,11 +49,11 @@
 .define accesstype .as
   .occurs[1 to inf] (
     space
-    .optional "-"[1]
-    "read"[2] .or
-    "write"[3] .or
-    "execute"[4] .or
-    "inherit"[5]
+    ("-"[2] .or .null[1])
+    "read"[3] .or
+    "write"[4] .or
+    "execute"[5] .or
+    "inherit"[6]
     )
 
 .define statement .as

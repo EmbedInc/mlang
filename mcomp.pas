@@ -203,6 +203,13 @@ done_opts:                             {done with all the command line options}
   mcomp_parse (coll_p^, stat);         {parse the pre-processed collection of lines}
   sys_error_abort (stat, '', '', nil, 0);
 
+
+  writeln;
+  code_memsym_show_all (code_p^, 0);
+
+
+
+
 abort1:                                {jump here to leave with FLINE library open}
   fline_lib_end (fl_p);                {end this use of the FLINE library}
   end.

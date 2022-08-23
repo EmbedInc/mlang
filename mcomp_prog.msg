@@ -1,6 +1,25 @@
 //   Messages used by the MCOMP program.
 //
+msg accty_err
+  lan english -def
+    Invalid access type.
+msg accty_npar
+  lan english -def
+    Parent does not have this access type.  Only access types that the
+    parent has can be added.
 msg indent_bad
   lan english -def
     Invalid indentation of %p1i found.  Indentation must be an even number
     of blanks.
+msg mem_err
+  lan english -def
+    Error in MEMORY statement.
+msg mem_name_none
+  lan english -def
+    Unable to get memory name.
+msg mem_opt_bad
+  lan english -def
+    Invalid MEMORY option.
+msg statement_bad
+  lan english -def
+    Invalid statement.
