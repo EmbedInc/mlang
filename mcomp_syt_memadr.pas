@@ -69,8 +69,8 @@ syn_tag_end_k: begin                   {end of options}
 
 3:    begin                            {ACCESS}
         mcomp_syt_accesstype (         {interpret the ACCESSTYPE syntax}
-          mem_p^.attr,                 {access type to update}
-          ~setof(code_memattr_t));     {parent access types, all for top level}
+          mem_p^.accs,                 {access type to update}
+          ~setof(code_memaccs_t));     {parent access types, all for top level}
         end;
 
 otherwise                              {unexpected tag}
@@ -79,7 +79,7 @@ otherwise                              {unexpected tag}
     end;                               {back to get next command option}
 
 done_syn:                              {done interpreting syntax}
-  if mem_p^.attr = [] then begin       {no access to this memory ?}
+  if mem_p^.accs = [] then begin       {no access to this memory ?}
     syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'access_none', nil, 0);
     end;
 
@@ -176,8 +176,8 @@ syn_tag_end_k: begin                   {end of options}
 
 4:    begin                            {ACCESS}
         mcomp_syt_accesstype (         {interpret the ACCESSTYPE syntax}
-          memreg_p^.attr,              {access type to update}
-          memreg_p^.mem_p^.attr);      {parent access types}
+          memreg_p^.accs,              {access type to update}
+          memreg_p^.mem_p^.accs);      {parent access types}
         access := true;                {remember that ACCESS was specified}
         end;
 
@@ -200,9 +200,9 @@ done_syn:                              {done interpreting syntax}
     end;
 
   if not access then begin             {access not specified ?}
-    memreg_p^.attr := memreg_p^.mem_p^.attr; {default to parent's access}
+    memreg_p^.accs := memreg_p^.mem_p^.accs; {default to parent's access}
     end;
-  if memreg_p^.attr = [] then begin    {no access to this memory ?}
+  if memreg_p^.accs = [] then begin    {no access to this memory ?}
     syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'access_none', nil, 0);
     end;
 

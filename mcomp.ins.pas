@@ -70,8 +70,8 @@ function mcomp_syn_statement (         {parse one top level statement}
   val_param; extern;
 
 procedure mcomp_syt_accesstype (       {interpret ACCESSTYPE syntax}
-  in out  attr: code_memattr_t;        {attributes to update}
-  in      parent: code_memattr_t);     {parent code attributes}
+  in out  accs: code_memaccs_t;        {access list to update}
+  in      parent: code_memaccs_t);     {parent code accsibutes}
   val_param; extern;
 
 function mcomp_syt_integer             {interpret INTEGER syntax}

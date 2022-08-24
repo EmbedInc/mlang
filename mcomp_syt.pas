@@ -72,62 +72,60 @@ begin
 {
 ********************************************************************************
 *
-*   Subroutine MCOMP_SYT_ACCESSTYPE (ATTR, PARENT)
+*   Subroutine MCOMP_SYT_ACCESSTYPE (ACCS, PARENT)
 *
-*   Interpret the ACCESSTYPE syntax.  ATTR is the attributes to modify.  PARENT
-*   are the parent attributes.
+*   Interpret the ACCESSTYPE syntax.  ACCS is the list of accesses to modify.
+*   PARENT are the parent's accesses.
 }
 procedure mcomp_syt_accesstype (       {interpret ACCESSTYPE syntax}
-  in out  attr: code_memattr_t;        {attributes to update}
-  in      parent: code_memattr_t);     {parent code attributes}
+  in out  accs: code_memaccs_t;        {access list to update}
+  in      parent: code_memaccs_t);     {parent code accsibutes}
   val_param;
 
 var
   tag: sys_int_machine_t;              {syntax tag ID}
-  remove: boolean;                     {removed the access instead of adding it}
-  accnew: code_memattr_t;              {accesses to add or remove}
-  acc: code_memattr_t;                 {scratch accesses}
+  remove: boolean;                     {removed new accesses instead of adding them}
+  accnew: code_memaccs_t;              {accesses to add or remove}
+  acc: code_memaccs_t;                 {scratch accesses}
 
 begin
   if not syn_trav_next_down (syn_p^) then begin {down into ACCESSTYPE syntax}
     syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'accty_err', nil, 0);
     end;
 
-  attr := [];                          {init to no access types}
+  accs := [];                          {init to no access}
   while true do begin                  {loop thru the options}
-    tag := syn_trav_next_tag (syn_p^); {get tag for this option}
-    accnew := [];                      {init to no accesses being added or removed}
-    case tag of                        {which option is it ?}
 
+    tag := syn_trav_next_tag (syn_p^); {get tag for optional preceeding "-"}
+    case tag of
 syn_tag_end_k: begin                   {end of options}
         discard( syn_trav_up (syn_p^) ); {back up to parent level}
         return;
         end;
+1:    remove := false;
+2:    remove := true;
+otherwise
+      syn_msg_tag_bomb (syn_p^, 'mcomp_prog', 'accty_err', nil, 0);
+      end;
 
-1:    begin                            {no "-"}
-        remove := false;
+    accnew := [];                      {init to no accesses being added or removed}
+    tag := syn_trav_next_tag (syn_p^); {get tag for the access type}
+    case tag of                        {which access is it ?}
+1:    begin                            {READ}
+        accnew := [code_memaccs_rd_k];
         end;
 
-2:    begin                            {"-"}
-        remove := true;
+2:    begin                            {WRITE}
+        accnew := [code_memaccs_wr_k];
         end;
 
-3:    begin                            {READ}
-        accnew := [code_memattr_rd_k];
+3:    begin                            {EXECUTE}
+        accnew := [code_memaccs_ex_k];
         end;
 
-4:    begin                            {WRITE}
-        accnew := [code_memattr_wr_k];
-        end;
-
-5:    begin                            {EXECUTE}
-        accnew := [code_memattr_ex_k];
-        end;
-
-6:    begin                            {INHERIT}
+4:    begin                            {INHERIT}
         accnew := parent;
         end;
-
 otherwise                              {unexpected tag}
       syn_msg_tag_bomb (syn_p^, 'mcomp_prog', 'accty_err', nil, 0);
       end;                             {end of tag cases}
@@ -141,10 +139,10 @@ otherwise                              {unexpected tag}
 
     if remove
       then begin                       {remove the new accesses in ACCNEW}
-        attr := attr - accnew;
+        accs := accs - accnew;
         end
       else begin                       {add the new accesses in ACCNEW}
-        attr := attr + accnew;
+        accs := accs + accnew;
         end
       ;
     end;                               {back to get next command option}

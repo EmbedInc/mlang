@@ -50,10 +50,10 @@
   .occurs[1 to inf] (
     space
     ("-"[2] .or .null[1])
-    ( "read"[3] .or
-      "write"[4] .or
-      "execute"[5] .or
-      "inherit"[6]
+    ( "read"[1] .or
+      "write"[2] .or
+      "execute"[3] .or
+      "inherit"[4]
       )
     )
 
