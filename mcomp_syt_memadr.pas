@@ -23,6 +23,9 @@ var
   mem_p: code_memory_p_t;              {pointer to the new memory descriptor}
   stat: sys_err_t;
 
+label
+  done_syn;
+
 begin
   name.max := size_char(name.str);     {init local var string}
 
@@ -53,8 +56,7 @@ begin
     case tag of                        {which option is it ?}
 
 syn_tag_end_k: begin                   {end of options}
-        discard( syn_trav_up (syn_p^) ); {back up to parent level}
-        return;
+        goto done_syn;
         end;
 
 1:    begin                            {ADRBITS}
@@ -75,6 +77,13 @@ otherwise                              {unexpected tag}
       syn_msg_tag_bomb (syn_p^, 'mcomp_prog', 'mem_opt_bad', nil, 0);
       end;
     end;                               {back to get next command option}
+
+done_syn:                              {done interpreting syntax}
+  if mem_p^.attr = [] then begin       {no access to this memory ?}
+    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'access_none', nil, 0);
+    end;
+
+  discard( syn_trav_up (syn_p^) );     {back up to parent level}
   end;
 {
 ********************************************************************************
@@ -94,6 +103,7 @@ var
   len: sys_int_conv32_t;               {length of memory region}
   len_set: boolean;                    {memory region length was specified}
   end_set: boolean;                    {memory region end address was specified}
+  access: boolean;                     {ACCESS specified}
   stat: sys_err_t;
 
 label
@@ -138,8 +148,9 @@ begin
 {
 *   Process the command options.
 }
-  len_set := false;                    {adr length not specified}
-  end_set := false;                    {end adr not specified}
+  len_set := false;                    {init to adr length not specified}
+  end_set := false;                    {init to end adr not specified}
+  access := false;                     {init to ACCESS not specified}
 
   while true do begin                  {loop thru optional parameters}
     tag := syn_trav_next_tag (syn_p^); {get tag for next option}
@@ -167,6 +178,7 @@ syn_tag_end_k: begin                   {end of options}
         mcomp_syt_accesstype (         {interpret the ACCESSTYPE syntax}
           memreg_p^.attr,              {access type to update}
           memreg_p^.mem_p^.attr);      {parent access types}
+        access := true;                {remember that ACCESS was specified}
         end;
 
 otherwise                              {unexpected tag}
@@ -185,6 +197,13 @@ done_syn:                              {done interpreting syntax}
     end;
   if not end_set then begin            {length specified but not end address ?}
     memreg_p^.adren := memreg_p^.adrst + (len - 1); {set end address from length}
+    end;
+
+  if not access then begin             {access not specified ?}
+    memreg_p^.attr := memreg_p^.mem_p^.attr; {default to parent's access}
+    end;
+  if memreg_p^.attr = [] then begin    {no access to this memory ?}
+    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'access_none', nil, 0);
     end;
 
   discard( syn_trav_up (syn_p^) );     {back up to parent level}

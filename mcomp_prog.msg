@@ -1,5 +1,8 @@
 //   Messages used by the MCOMP program.
 //
+msg access_none
+  lan english -def
+    No access specified.  Some access is required.
 msg accty_err
   lan english -def
     Invalid access type.
