@@ -10,14 +10,17 @@
 *   the entry immediately before the downlink to the syntax construction the
 *   routine is supposed to interpret.  When done, the routine leaves the
 *   position at the downlink.  This apprears to advance one entry at the current
-*   level.  Any SYT routine not following this convention must be clearly marked
-*   so.
+*   level.  In any case, syntax interpretation routines should leave the syntax
+*   tree position so that the next tree entry is the next thing to process.  For
+*   example if the next expected tree item is a tag, the calling routine should
+*   be able to call SYN_TRAV_NEXT_TAG immediately after the previous syntax
+*   interpretation routine returns.
 }
 module mcomp_syt;
+define mcomp_currline;
 define mcomp_syt_integer;
 define mcomp_syt_accesstype;
 define mcomp_syt_statement;
-define mcomp_syt_memory_;
 %include 'mcomp.ins.pas';
 {
 ********************************************************************************
@@ -173,10 +176,13 @@ begin
       mcomp_syt_memory_;
       end;
 3:  begin                              {MEMREGION}
+      mcomp_syt_memregion_;
       end;
 4:  begin                              {ADRSPACE}
+      mcomp_syt_adrspace_;
       end;
 5:  begin                              {ADRREGION}
+      mcomp_syt_adrregion_;
       end;
 6:  begin                              {SET (assignment)}
       end;
@@ -185,73 +191,4 @@ otherwise                              {unexpected tag}
     end;
 
   discard( syn_trav_up (syn_p^) );     {back up to parent level}
-  end;
-{
-********************************************************************************
-*
-*   Subroutine MCOMP_SYT_MEMORY_
-*
-*   Interpret the MEMORY_ syntax.
-}
-procedure mcomp_syt_memory_;           {interpret MEMORY_ syntax}
-  val_param;
-
-var
-  tag: sys_int_machine_t;              {syntax tag ID}
-  name: string_var32_t;                {memory name}
-  mem_p: code_memory_p_t;              {pointer to the new memory descriptor}
-  stat: sys_err_t;
-
-begin
-  name.max := size_char(name.str);     {init local var string}
-
-  if not syn_trav_next_down (syn_p^) then begin {down into MEMORY_ syntax}
-    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'mem_err', nil, 0);
-    end;
-{
-*   Create and initialize the memory descriptor.
-}
-  tag := syn_trav_next_tag (syn_p^);   {get tag for memory name}
-  if tag <> 1 then begin
-    syn_msg_tag_bomb (syn_p^, 'mcomp_prog', 'mem_name_none', nil, 0);
-    end;
-  syn_trav_tag_string (syn_p^, name);  {get the new memory name}
-  code_mem_new (code_p^, name, mem_p, stat); {create the new memory descriptor}
-  syn_error_bomb (syn_p^, stat, 'mcomp_prog', 'mem_err', nil, 0);
-  syn_trav_tag_start (syn_p^, mem_p^.sym_p^.pos); {save source code position}
-  code_comm_find (                     {tag the new structure with comment, if any}
-    code_p^,                           {CODE library use state}
-    mcomp_currline,                    {current global sequential source line number}
-    currlevel,                         {current nesting level}
-    mem_p^.sym_p^.comm_p);             {returned pointer to comments}
-{
-*   Process the command options.
-}
-  while true do begin                  {loop thru optional parameters}
-    tag := syn_trav_next_tag (syn_p^); {get tag for next option}
-    case tag of                        {which option is it ?}
-
-syn_tag_end_k: begin                   {end of options}
-        discard( syn_trav_up (syn_p^) ); {back up to parent level}
-        return;
-        end;
-
-1:    begin                            {ADRBITS}
-        mem_p^.bitsadr := mcomp_syt_integer;
-        end;
-
-2:    begin                            {DATBITS}
-        mem_p^.bitsdat := mcomp_syt_integer;
-        end;
-
-3:    begin                            {ACCESS}
-        mcomp_syt_accesstype (         {interpret the ACCESSTYPE syntax}
-          mem_p^.attr,                 {access type to update}
-          ~setof(code_memattr_t));     {parent access types, all for top level}
-        end;
-
-otherwise                              {unexpected tag}
-      syn_msg_tag_bomb (syn_p^, 'mcomp_prog', 'mem_opt_bad', nil, 0);
-      end;
-    end;                               {back to get next command option}
   end;

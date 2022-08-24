@@ -20,6 +20,21 @@ msg mem_name_none
 msg mem_opt_bad
   lan english -def
     Invalid MEMORY option.
+msg memreg_err
+  lan english -def
+    Error in MEMORY REGION statement.
+msg memreg_name_none
+  lan english -def
+    Unable to get memory region name.
+msg memreg_opt_bad
+  lan english -def
+    Invalid MEMORY REGION option.
+msg end_len_diff
+  lan english -def
+    Mismatch between address length and end address.
+msg end_len_none
+  lan english -def
+    Missing end address or length.
 msg statement_bad
   lan english -def
     Invalid statement.

@@ -78,7 +78,16 @@ function mcomp_syt_integer             {interpret INTEGER syntax}
   :sys_int_max_t;
   val_param; extern;
 
+procedure mcomp_syt_adrregion_;        {interpret ADRREGION_ syntax}
+  val_param; extern;
+
+procedure mcomp_syt_adrspace_;         {interpret ADRSPACE_ syntax}
+  val_param; extern;
+
 procedure mcomp_syt_memory_;           {interpret MEMORY_ syntax}
+  val_param; extern;
+
+procedure mcomp_syt_memregion_;        {interpret MEMREGION_ syntax}
   val_param; extern;
 
 procedure mcomp_syt_statement;         {interpret STATEMENT syntax}

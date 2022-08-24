@@ -5,4 +5,5 @@ mcomp_mem.obj
 mcomp_parse.obj
 mcomp_syn.obj
 mcomp_syt.obj
+mcomp_syt_memadr.obj
 mlang.obj

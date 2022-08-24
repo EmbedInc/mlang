@@ -12,6 +12,7 @@ call src_pas %srcdir% mcomp_mem
 call src_pas %srcdir% mcomp_parse
 call src_pas %srcdir% mcomp_syn
 call src_pas %srcdir% mcomp_syt
+call src_pas %srcdir% mcomp_syt_memadr
 call src_syn mlang
 
 call src_lib %srcdir% mcompprog private
