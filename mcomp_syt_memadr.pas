@@ -218,7 +218,73 @@ done_syn:                              {done interpreting syntax}
 procedure mcomp_syt_adrspace_;         {interpret ADRSPACE_ syntax}
   val_param;
 
+var
+  tag: sys_int_machine_t;              {syntax tag ID}
+  name: string_var32_t;                {address space name}
+  adr_p: code_adrspace_p_t;            {pointer to the new address space descriptor}
+  stat: sys_err_t;
+
+label
+  done_syn;
+
 begin
+  name.max := size_char(name.str);     {init local var string}
+
+  if not syn_trav_next_down (syn_p^) then begin {down into ADRSPACE_ syntax}
+    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'adr_err', nil, 0);
+    end;
+{
+*   Create and initialize the memory descriptor.
+}
+  tag := syn_trav_next_tag (syn_p^);   {get tag for address space name}
+  if tag <> 1 then begin
+    syn_msg_tag_bomb (syn_p^, 'mcomp_prog', 'adr_name_none', nil, 0);
+    end;
+  syn_trav_tag_string (syn_p^, name);  {get the new address space name}
+  code_adrsp_new (code_p^, name, adr_p, stat); {create the new address space descriptor}
+  syn_error_bomb (syn_p^, stat, 'mcomp_prog', 'adr_err', nil, 0);
+  syn_trav_tag_start (syn_p^, adr_p^.sym_p^.pos); {save source code position}
+  code_comm_find (                     {tag the new structure with comment, if any}
+    code_p^,                           {CODE library use state}
+    mcomp_currline,                    {current global sequential source line number}
+    currlevel,                         {current nesting level}
+    adr_p^.sym_p^.comm_p);             {returned pointer to comments}
+{
+*   Process the command options.
+}
+  while true do begin                  {loop thru optional parameters}
+    tag := syn_trav_next_tag (syn_p^); {get tag for next option}
+    case tag of                        {which option is it ?}
+
+syn_tag_end_k: begin                   {end of options}
+        goto done_syn;
+        end;
+
+1:    begin                            {ADRBITS}
+        adr_p^.bitsadr := mcomp_syt_integer;
+        end;
+
+2:    begin                            {DATBITS}
+        adr_p^.bitsdat := mcomp_syt_integer;
+        end;
+
+3:    begin                            {ACCESS}
+        mcomp_syt_accesstype (         {interpret the ACCESSTYPE syntax}
+          adr_p^.accs,                 {access type to update}
+          ~setof(code_memaccs_t));     {parent access types, all for top level}
+        end;
+
+otherwise                              {unexpected tag}
+      syn_msg_tag_bomb (syn_p^, 'mcomp_prog', 'adr_opt_bad', nil, 0);
+      end;
+    end;                               {back to get next command option}
+
+done_syn:                              {done interpreting syntax}
+  if adr_p^.accs = [] then begin       {no access to this address space ?}
+    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'access_none', nil, 0);
+    end;
+
+  discard( syn_trav_up (syn_p^) );     {back up to parent level}
   end;
 {
 ********************************************************************************

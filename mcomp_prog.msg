@@ -10,6 +10,15 @@ msg accty_npar
   lan english -def
     Parent does not have this access type.  Only access types that the
     parent has can be added.
+msg adr_err
+  lan english -def
+    Error in ADRSPACE statement.
+msg adr_name_none
+  lan english -def
+    Unable to get address space name.
+msg adr_opt_bad
+  lan english -def
+    Invalid adrspace option.
 msg indent_bad
   lan english -def
     Invalid indentation of %p1i found.  Indentation must be an even number
