@@ -10,7 +10,7 @@
 
 <h1 class=page>The M Computer Language
   <br>Memory Model</h1>
-<p class=page>Last updated 21 Aug 2022</p>
+<p class=page>Last updated 25 Aug 2022</p>
 
 
 <p>The M model of the underlying machine's memory architecture consists of
@@ -94,12 +94,10 @@ particular target machine.&nbsp;
   <p>The <tt><b>memory</b></tt> statement defines one physical memory
   available to the processor.&nbsp;  It defines the characteristics of the
   memory itself, not how it is accessed or mapped into the processor's
-  address space (that is done with the <tt><b>address</b></tt>
-  statement).&nbsp;
+  address space.
 
   <p>This statement defines the symbol <tt><i>name</i></tt> to refer to
-  the memory space.&nbsp;  The parameters that may follow the
-  <tt><b>memory</b></tt> statement are:
+  the memory space.&nbsp;  The parameters that may follow are:
 
   <p><tt><b>adrbits</b> <i>nbits</i></tt></p><indent>
 
@@ -157,11 +155,9 @@ particular target machine.&nbsp;
 
       <p><tt><b>inherit</b></tt></p><indent>
 
-        <p>Set all accesses to that of the parent.  This
-        <tt><i>accesstype</i></tt> is not valid for top level memory
-        structure commands, like <tt><b>memory</b></tt> or
-        <tt><b>adrspace</b></tt>.  Subsequent <tt><i>accesstype</i></tt>
-        parameters can modify the inherited accesses.
+        <p>Set all accesses to that of the parent.  For entiry types that
+        have no parent (like memories and address spaces), <i>inhert</i>
+        sets all possible access types.
 
         </p></indent>
 
@@ -192,9 +188,7 @@ particular target machine.&nbsp;
   <p>Address regions are defined later with reference to a memory
   region.&nbsp;  A memory with no memory region defined within it can have
   no address regions reference it, which means there is no known (to the
-  compiler) access to the memory from the program.&nbsp;  A memory with no
-  memory region is therefore pointless, and the compiler will issue a
-  warning that the memory is unused.&nbsp;
+  compiler) access to the memory from the program.&nbsp;
 
   <p>The parameters of this statement may be:
 
@@ -235,15 +229,6 @@ particular target machine.&nbsp;
 
   <p><tt><b>access</b> [-]<i>accesstype</i></tt></p><indent>
 
-    <p>This is the same as the <tt><b>access</b></tt> parameter to the
-    <tt><b>memory</b></tt> statement.&nbsp;  However, the access to a
-    memory region can never be less restrictive than that of the parent
-    memory as a whole.&nbsp;  Put another way, access types available in
-    the parent memory may be disabled for the memory region, but a access
-    type disabled in the parent memory can not be enabled for a memory
-    region.&nbsp;  The default access types of a memory region are those
-    of its parent memory.&nbsp;
-
     </p></indent>
 
   </p></indent>
@@ -263,14 +248,11 @@ particular target machine.&nbsp;
 
   <p><tt><b>access</b> <b>[-]</b><i>accesstype</i></tt>
 
-  <p><tt><b>state</b> <i>name</i> <i>description</i></tt>
-
   </p></indent>
 
 
 <h2 id="adrregion statement"><tt><b>adrregion</b> <i>name</i> <b>in</b>
-<i>adrspace</i> <b>to</b> <i>memregion</i> <i>parameter</i> ...
-<i>parameter</i></tt></h2><indent>
+<i>adrspace</i> <i>parameter</i> ... <i>parameter</i></tt></h2><indent>
 
   <p>Defines <tt><i>name</i></tt> as the symbol to represent a particular
   program-visible window to the portion of a physical memory defined by
@@ -281,7 +263,15 @@ particular target machine.&nbsp;
   <p>The possible parameters to the <tt><b>adrregion</b></tt> statement
   are:
 
-  <p><tt><b>depends</b> <i>statename</i> <i>value</i></tt>
+  <p><tt><b>startadr</b> <i>address</i></tt></p>
+
+  <p><tt><b>length</b> <i>size</i></tt></p>
+
+  <p><tt><b>endadr</b> <i>address</i></tt></p>
+
+  <p><tt><b>access</b> [-]<i>accesstype</i></tt></p>
+
+  <p><tt><b>mapsto</b> <i>memory region</i></tt></p>
 
   </p></indent>
 
