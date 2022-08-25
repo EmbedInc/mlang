@@ -26,3 +26,36 @@ adrspace progsp
     adrbits 13
     datbits 14
     access execute
+'
+'   Data memory.
+'
+memory datamem
+    adrbits 9
+    datbits 8
+    access read write
+
+memregion bank0 in datamem
+    startadr 16#020
+    endadr   16#06F
+memregion bank1 in datamem
+    startadr 16#0A0
+    endadr   16#0EF
+memregion bank2 in datamem
+    startadr 16#120
+    endadr   16#16F
+memregion bank3 in datamem
+    startadr 16#1A0
+    endadr   16#1EF
+
+adrspace data
+    adrbits 8
+    datbits 8
+    access read write
+
+adrregion banked in data
+    startadr 16#20
+    endadr   16#6F
+    mapsto bank0
+    mapsto bank1
+    mapsto bank2
+    mapsto bank3

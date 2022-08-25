@@ -101,7 +101,15 @@
     )
 
 .define adrregion_ .as
-  name[1] space "in" space name[1] space "to" space name[1]
+  name[1] space "in" space name[1]
+  .occurs[0 to inf] (
+    space
+    ("startadr" space integer[1]) .or
+    ("length" space integer[2]) .or
+    ("endadr" space integer[3]) .or
+    ("access" accesstype[4]) .or
+    ("mapsto" space name[5])
+    )
 
 .define set_ .as
   qname[1] pad "<<" pad expression[1]

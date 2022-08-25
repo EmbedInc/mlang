@@ -3,6 +3,15 @@
 msg access_none
   lan english -def
     No access specified.  Some access is required.
+msg adrreg_err
+  lan english -def
+    Error in ADDRESS REGION statement.
+msg adrreg_name_none
+  lan english -def
+    Unable to get address region name.
+msg adrreg_opt_bad
+  lan english -def
+    Invalid ADDRESS REGION option.
 msg accty_err
   lan english -def
     Invalid access type.
@@ -19,6 +28,12 @@ msg adr_name_none
 msg adr_opt_bad
   lan english -def
     Invalid adrspace option.
+msg end_len_diff
+  lan english -def
+    Mismatch between address length and end address.
+msg end_len_none
+  lan english -def
+    Missing end address or length.
 msg indent_bad
   lan english -def
     Invalid indentation of %p1i found.  Indentation must be an even number
@@ -38,15 +53,12 @@ msg memreg_err
 msg memreg_name_none
   lan english -def
     Unable to get memory region name.
+msg memreg_nfound
+  lan english -def
+    Memory region not previously define.
 msg memreg_opt_bad
   lan english -def
     Invalid MEMORY REGION option.
-msg end_len_diff
-  lan english -def
-    Mismatch between address length and end address.
-msg end_len_none
-  lan english -def
-    Missing end address or length.
 msg statement_bad
   lan english -def
     Invalid statement.
