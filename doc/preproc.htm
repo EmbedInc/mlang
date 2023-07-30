@@ -10,7 +10,41 @@
 
 <h1 class=page>The M Computer Language
   <br>Preprocessor</h1>
-<p class=page>Last updated 16 March 2014</p>
+<p class=page>Last updated 30 Jul 2023</p>
+
+
+<p>M source files are actually translated by the Embed scripting language
+interpreter (<a href="../escr/index.htm">ESCR</a>) in preprocessor mode,
+with the result compiled as M.
+
+See the <a href="../escr/index.htm">ESCR documentation</a> for a
+description of how to use the preprocessor.
+
+<p>The specific configurations of the ESCR script processor in the M compiler
+are:<ol>
+
+  <li>The script processor is run in preprocessor mode, not script mode.
+
+  <li>Preprocessor comments start with "//" and extend to the end of the
+  line.  These comments are not transferred to the resulting M source.
+
+  <li>M comments are understood by the preprocessor as data file comments.
+
+  <li>Preprocessor commands start with "#".
+
+  <li>No additional preprocessor commands beyond the <a
+  href="../escr/cmds.htm"> default set</a> are added.
+
+  <li>Preprocessor functions start with "{" and end with "}".
+
+  <li>No additional preprocessor functions beyond the <a
+  href="../escr/func.htm"> default set</a> are added.
+
+  <li>Literal strings to the preprocessor are enclosed in quotes ("...").
+
+  <li>Include file names are assumed to end with ".ins.m".
+
+  </ol>
 
 
 <hr><!-- ---------------------------------------------------------------------->
