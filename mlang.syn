@@ -18,9 +18,9 @@
 .symbol set_
 
 .define name .as                       /* bare symbol name
-  (.range['a' thru 'z'] .or .range['A' thru 'Z'])
+  .charcase [upper]
+  .range['A' thru 'Z']
   .occurs[0 to inf] (
-    .range['a' thru 'z'] .or
     .range['A' thru 'Z'] .or
     .range['0' thru '9'] .or
     "_"
@@ -29,9 +29,10 @@
 .define qname .as                      /* possibly qualified symbol name
   .optional ":"[1]
   name[2]
-  .occurs[1 to inf] (":" name[2])
+  .occurs[0 to inf] (":" name[2])
 
 .define integer .as                    /* integer in standard Embed format
+  .charcase [upper]
   .optional ("-" .or "+")
   .optional (
     .occurs[1 to inf] .range["0" thru "9"]
@@ -39,8 +40,7 @@
     )
   .occurs[1 to inf] (
     .range["0" thru "9"] .or
-    .range["A" thru "Z"] .or
-    .range["a" thru "z"]
+    .range["A" thru "Z"]
     )
 
 .define expression .as                 /* arbitrary expression
