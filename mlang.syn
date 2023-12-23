@@ -8,14 +8,16 @@
 .symbol integer                        /* Embed integer, B#DDDDDDD
 .symbol expression                     /* arbitrary expression that resolves to a value
 .symbol accesstype                     /* memory access type
-
-.symbol statement[mcomp_syn_statement] /* one statement
-
+.symbol statement[mcomp_syn_statement] /* one top level statement
+/*
+/*   Parts of statements without their leading keyword.
+/*
 .symbol memory_
 .symbol memregion_
 .symbol adrspace_
 .symbol adrregion_
 .symbol set_
+.symbol type_
 
 .define name .as                       /* bare symbol name
   .charcase [upper]
@@ -65,6 +67,7 @@
     ("adrspace" space adrspace_[4]) .or
     ("adrregion" space adrregion_[5]) .or
     ("set" space set_[6]) .or
+    ("type" space type_[7]) .or
     set_[6]
     )
   pad .eol
@@ -113,3 +116,6 @@
 
 .define set_ .as
   qname[1] pad "<<" pad expression[1]
+
+.define type_ .as
+  name[1]                              /* placeholder for now

@@ -79,7 +79,7 @@ begin
 }
 procedure mcomp_syt_accesstype (       {interpret ACCESSTYPE syntax}
   in out  accs: code_memaccs_t;        {access list to update}
-  in      parent: code_memaccs_t);     {parent code accsibutes}
+  in      parent: code_memaccs_t);     {parent code attributes}
   val_param;
 
 var
