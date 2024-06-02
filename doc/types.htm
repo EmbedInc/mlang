@@ -10,7 +10,7 @@
 
 <h1 class=page>The M Computer Language
   <br>Data Types</h1>
-<p class=page>Last updated 27 May 2024</p>
+<p class=page>Last updated 2 June 2024</p>
 
 <p>This chapter defines the syntax for describing data types.  Such data
 type descriptions are used, for example, in <b>var</b> and <b>type</b>
@@ -18,13 +18,170 @@ statements.
 
 <h2>Built-in data types</h2><indent>
 
-  <p>
+  <p>Built-in data types are those that are inherently known by M.  All
+  user-defined data types are ultimately arrangements of built-in data
+  types.  The built-in data types are:
 
+  <h3><tt>int<i>xx</i>eu_t</tt>, <tt>int<i>xx</i>es_t</tt></h3><indent>
 
+    <p>Binary integers with exact bit widths.  These integers provide
+    identical operation across all implementations, at the possible
+    expense of additional underlying operations each operation.
 
+    <p>The types ending in <tt>u_t</tt> are unsigned, and those ending in
+    <tt>s_t</tt> are signed.
 
+    <p>The <tt><i>xx</i></tt> part is a decimal value indicating the
+    number of bits.
 
+    <p>Implementations may use more storage than specified according to
+    the number of bits, but all operations function as if the integer were
+    exactly the specified number of bits wide.
 
+    <p>For example, <tt>int3eu_t</tt> could be stored in a whole 8-bit
+    byte in a particular implementation, effectively leaving 5 bits
+    unused. Such an integer can only take on values of 0-7 regardless of
+    the underlying implementation.  Adding 1 to such an integer that has a
+    value of 7 will result in a value of 0, just as it would if the
+    integer were really only 3 bits wide.
+
+    <p>Note that exact-width integers of sizes not a multiple of the
+    underlying memory width may require more machine instructions for each
+    manipulation. While this guarantees identical operation across all
+    target systems, the possible inefficiency on particular target systems
+    should be kept in mind by the programmer.
+
+    <h4>Unsigned format</h4><indent>
+
+      <p>Unsigned integers are in ordinary binary (base 2) format. For
+      example, all the possible values of <tt>int3eu_t</tt> are:
+
+      <table>
+        <thead>
+          <tr>
+            <th>&nbsp;Binary&nbsp;
+            <th>&nbsp;Decimal value&nbsp;
+          </thead>
+        <tbody>
+          <tr>
+            <td>000
+            <td>0
+          <tr>
+            <td>001
+            <td>1
+          <tr>
+            <td>010
+            <td>2
+          <tr>
+            <td>011
+            <td>3
+          <tr>
+            <td>100
+            <td>4
+          <tr>
+            <td>101
+            <td>5
+          <tr>
+            <td>110
+            <td>6
+          <tr>
+            <td>111
+            <td>7
+          </tbody>
+        </table>
+
+      </p></indent>
+
+    <h4>Signed format</h4><indent>
+
+      <p>Signed integers are in twos-compliment binary format. For
+      example, all the possible values of <tt>int3es_t</tt> are:
+
+      <table>
+        <thead>
+          <tr>
+            <th>&nbsp;Binary&nbsp;
+            <th>&nbsp;Decimal value&nbsp;
+          </thead>
+        <tbody>
+          <tr>
+            <td>100
+            <td>-4
+          <tr>
+            <td>101
+            <td>-3
+          <tr>
+            <td>110
+            <td>-2
+          <tr>
+            <td>111
+            <td>-1
+          <tr>
+            <td>000
+            <td>0
+          <tr>
+            <td>001
+            <td>1
+          <tr>
+            <td>010
+            <td>2
+          <tr>
+            <td>011
+            <td>3
+          </tbody>
+        </table>
+
+      </p></indent>
+
+    <h4>Overflow and underflow</h4><indent>
+
+      <p>Operations on integers act as if intermediate values are
+      infinitely wide, then all but the low N bits of the result used,
+      where N is the number of logical bits in the destination integer.
+      For example 255 + 1 into <tt>int8eu_t</tt> results in 0, and 127 + 1
+      into <tt>int8es_t</tt> results in -128.
+
+      <p>All overflows and underflows are handled silently and are not
+      considered errors.  There is no automatic saturation or clipping.
+
+      </p></indent>
+
+    </p></indent>
+
+  <h3><tt>intu_t</tt>, <tt>int<i>xx</i>u_t</tt>, <tt>ints_t</tt>,
+  <tt>int<i>xx</i>s_t</tt></h3><indent>
+
+    <p>Binary integers with minimum guaranteed widths.  These integers
+    provide identical operation across all implementations only over a
+    minimum set of values.  Operations outside the minimum set of values
+    may differ across implementations.  The advantage is that the relaxed
+    requirements of these integers may allow direct mapping to and
+    efficient use of target hardware.
+
+    <p>The types ending in <tt>u_t</tt> are unsigned, and those ending in
+    <tt>s_t</tt> are signed.
+
+    <p>The <tt><i>xx</i></tt> part is a decimal value indicating the
+    number of bits.  When omitted, the integer size defaults to the most
+    convenient for the target hardware.  This is usually the width of the
+    ALU or the data registers of the target hardware.  It may also depend
+    on the characteristics of the memory the integer is stored in.  The
+    rules for the default integer size must be specified for each
+    implementation of M.
+
+    <p>Each of these integers will ultimately be one of the exact width
+    integers (<tt>int<i>xx</i>eu_t</tt> or <tt>int<i>xx</i>es_t</tt>,
+    above), except that the implementation of M is free to pick a value of
+    <tt><i>xx</i></tt> greater than or equal to the value specified in the
+    data type.
+
+    <p>For example, <tt>int4u_t</tt> may be implemented as
+    <tt>int8eu_t</tt> in a particular implementation.  Operations
+    resulting in values of 0-15 will be the same accross implementations.
+    However, 15 + 1 would result in 16, whereas it would result in 0 on
+    implementations where exactly 4 bits were used.
+
+    </p></indent>
 
   </p></indent>
 
