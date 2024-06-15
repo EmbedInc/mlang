@@ -10,180 +10,155 @@
 
 <h1 class=page>The M Computer Language
   <br>Data Types</h1>
-<p class=page>Last updated 2 June 2024</p>
+<p class=page>Last updated 15 June 2024</p>
 
 <p>This chapter defines the syntax for describing data types.  Such data
 type descriptions are used, for example, in <b>var</b> and <b>type</b>
 statements.
 
-<h2>Built-in data types</h2><indent>
+<p>The data type specifications are:
 
-  <p>Built-in data types are those that are inherently known by M.  All
-  user-defined data types are ultimately arrangements of built-in data
-  types.  The built-in data types are:
+<h2><tt>integer</tt> <i>[option ... option]</i></h2><indent>
 
-  <h3><tt>int<i>xx</i>eu_t</tt>, <tt>int<i>xx</i>es_t</tt></h3><indent>
+  <p>Values of this data type can only be integers, within the range
+  implied or specified by the optional parameters.
 
-    <p>Binary integers with exact bit widths.  These integers provide
-    identical operation across all implementations, at the possible
-    expense of additional underlying operations each operation.
+  <p>Operations on integers act as if intermediate values are infinitely
+  wide, then all but the low N bits of the result used, where N is the
+  number of logical bits in the destination integer. For example 255 + 1
+  into an 8-bit unsigned integer results in 0, and 127 + 1 into an 8-bit
+  signed integer results in -128.
 
-    <p>The types ending in <tt>u_t</tt> are unsigned, and those ending in
-    <tt>s_t</tt> are signed.
+  <p>All overflows and underflows are handled silently and are not
+  considered errors.  There is no automatic saturation.
 
-    <p>The <tt><i>xx</i></tt> part is a decimal value indicating the
-    number of bits.
+  <p>The optional sub-commands are:
 
-    <p>Implementations may use more storage than specified according to
-    the number of bits, but all operations function as if the integer were
-    exactly the specified number of bits wide.
+  <h3><tt>signed</tt></h3><indent>
 
-    <p>For example, <tt>int3eu_t</tt> could be stored in a whole 8-bit
-    byte in a particular implementation, effectively leaving 5 bits
-    unused. Such an integer can only take on values of 0-7 regardless of
-    the underlying implementation.  Adding 1 to such an integer that has a
-    value of 7 will result in a value of 0, just as it would if the
-    integer were really only 3 bits wide.
+    <p>The integer will be signed.  The default is unsigned.
 
-    <p>Note that exact-width integers of sizes not a multiple of the
-    underlying memory width may require more machine instructions for each
-    manipulation. While this guarantees identical operation across all
-    target systems, the possible inefficiency on particular target systems
-    should be kept in mind by the programmer.
+    <p>Unsigned integers are in ordinary binary (base 2) format. For
+    example, all the possible values of a 3-bit unsigned integer are:
 
-    <h4>Unsigned format</h4><indent>
+    <table>
+      <thead>
+        <tr>
+          <th>&nbsp;Binary&nbsp;
+          <th>&nbsp;Decimal value&nbsp;
+        </thead>
+      <tbody>
+        <tr>
+          <td>000
+          <td>0
+        <tr>
+          <td>001
+          <td>1
+        <tr>
+          <td>010
+          <td>2
+        <tr>
+          <td>011
+          <td>3
+        <tr>
+          <td>100
+          <td>4
+        <tr>
+          <td>101
+          <td>5
+        <tr>
+          <td>110
+          <td>6
+        <tr>
+          <td>111
+          <td>7
+        </tbody>
+      </table>
 
-      <p>Unsigned integers are in ordinary binary (base 2) format. For
-      example, all the possible values of <tt>int3eu_t</tt> are:
+    <p>Signed integers are in twos-compliment binary format. For example,
+    all the possible values of a 3-bit signed integer are:
 
-      <table>
-        <thead>
-          <tr>
-            <th>&nbsp;Binary&nbsp;
-            <th>&nbsp;Decimal value&nbsp;
-          </thead>
-        <tbody>
-          <tr>
-            <td>000
-            <td>0
-          <tr>
-            <td>001
-            <td>1
-          <tr>
-            <td>010
-            <td>2
-          <tr>
-            <td>011
-            <td>3
-          <tr>
-            <td>100
-            <td>4
-          <tr>
-            <td>101
-            <td>5
-          <tr>
-            <td>110
-            <td>6
-          <tr>
-            <td>111
-            <td>7
-          </tbody>
-        </table>
+    <table>
+      <thead>
+        <tr>
+          <th>&nbsp;Binary&nbsp;
+          <th>&nbsp;Decimal value&nbsp;
+        </thead>
+      <tbody>
+        <tr>
+          <td>100
+          <td>-4
+        <tr>
+          <td>101
+          <td>-3
+        <tr>
+          <td>110
+          <td>-2
+        <tr>
+          <td>111
+          <td>-1
+        <tr>
+          <td>000
+          <td>0
+        <tr>
+          <td>001
+          <td>1
+        <tr>
+          <td>010
+          <td>2
+        <tr>
+          <td>011
+          <td>3
+        </tbody>
+      </table>
 
-      </p></indent>
+    </p></indent><!-- end of INTEGER > SIGNED -->
 
-    <h4>Signed format</h4><indent>
+  <h3><tt>bits</tt> <i>N</i></h3><indent>
 
-      <p>Signed integers are in twos-compliment binary format. For
-      example, all the possible values of <tt>int3es_t</tt> are:
+    <p>The integer must be at least <i>N</i> bits wide. Implementations
+    are allowed to use more bits if that maps more efficiently to the
+    target hardware.
 
-      <table>
-        <thead>
-          <tr>
-            <th>&nbsp;Binary&nbsp;
-            <th>&nbsp;Decimal value&nbsp;
-          </thead>
-        <tbody>
-          <tr>
-            <td>100
-            <td>-4
-          <tr>
-            <td>101
-            <td>-3
-          <tr>
-            <td>110
-            <td>-2
-          <tr>
-            <td>111
-            <td>-1
-          <tr>
-            <td>000
-            <td>0
-          <tr>
-            <td>001
-            <td>1
-          <tr>
-            <td>010
-            <td>2
-          <tr>
-            <td>011
-            <td>3
-          </tbody>
-        </table>
+    <p>For example, on an 8-bit microcontroller <tt>integer bits 8</tt>
+    would likely be implemented as a single 8-bit byte, whereas
+    <tt>integer bits 12</tt> may be implemented as two 8-bit bytes (16
+    bits).
 
-      </p></indent>
+    <p>The default is the size integer that maps most directly (and
+    therefore results in the most efficient operations) to the target
+    hardware.  The default integer size must be specified for each target
+    implementation.
 
-    <h4>Overflow and underflow</h4><indent>
+    </p></indent><!-- end of INTEGER > BITS -->
 
-      <p>Operations on integers act as if intermediate values are
-      infinitely wide, then all but the low N bits of the result used,
-      where N is the number of logical bits in the destination integer.
-      For example 255 + 1 into <tt>int8eu_t</tt> results in 0, and 127 + 1
-      into <tt>int8es_t</tt> results in -128.
+  <h3><tt>bitsexact</tt> <i>N</i></h3><indent>
 
-      <p>All overflows and underflows are handled silently and are not
-      considered errors.  There is no automatic saturation or clipping.
+    <p>The integer must act as if it were exactly <i>N</i> bits wide.
+    Unless data structures are explicitly packed to use the minimum
+    possible bits, implementations are allowed to use more bits of storage
+    than <i>N</i>.  However, operations and resulting values must be as if
+    the integer were exactly <i>N</i> bits wide.
 
-      </p></indent>
+    <p>For example on a 8-bit microcontroller, <tt>integer bitsexact
+    6</tt> may be stored in a whole 8-bit byte, but can only take on
+    values of 0 to 63.  Adding 1 to such an integer with a starting value
+    of 63 results in 0, even if there are more bits of storage so that 64
+    could have been represented.
 
-    </p></indent>
+    <p>This option guarantees integers act identically across different
+    target processors, at the possible expense of additional operations
+    when the specified size does not match a size the hardware can
+    manipulate natively.
 
-  <h3><tt>intu_t</tt>, <tt>int<i>xx</i>u_t</tt>, <tt>ints_t</tt>,
-  <tt>int<i>xx</i>s_t</tt></h3><indent>
+    <p>The default is the size integer that maps most directly (and
+    therefore results in the most efficient operations) to the target
+    hardware.  The default integer size must be specified for each target
+    implementation.
 
-    <p>Binary integers with minimum guaranteed widths.  These integers
-    provide identical operation across all implementations only over a
-    minimum set of values.  Operations outside the minimum set of values
-    may differ across implementations.  The advantage is that the relaxed
-    requirements of these integers may allow direct mapping to and
-    efficient use of target hardware.
+    </p></indent><!-- end of INTEGER > BITSEXACT -->
 
-    <p>The types ending in <tt>u_t</tt> are unsigned, and those ending in
-    <tt>s_t</tt> are signed.
-
-    <p>The <tt><i>xx</i></tt> part is a decimal value indicating the
-    number of bits.  When omitted, the integer size defaults to the most
-    convenient for the target hardware.  This is usually the width of the
-    ALU or the data registers of the target hardware.  It may also depend
-    on the characteristics of the memory the integer is stored in.  The
-    rules for the default integer size must be specified for each
-    implementation of M.
-
-    <p>Each of these integers will ultimately be one of the exact width
-    integers (<tt>int<i>xx</i>eu_t</tt> or <tt>int<i>xx</i>es_t</tt>,
-    above), except that the implementation of M is free to pick a value of
-    <tt><i>xx</i></tt> greater than or equal to the value specified in the
-    data type.
-
-    <p>For example, <tt>int4u_t</tt> may be implemented as
-    <tt>int8eu_t</tt> in a particular implementation.  Operations
-    resulting in values of 0-15 will be the same accross implementations.
-    However, 15 + 1 would result in 16, whereas it would result in 0 on
-    implementations where exactly 4 bits were used.
-
-    </p></indent>
-
-  </p></indent>
+  </p></indent><!-- end of INTEGER -->
 
 
 <hr><!-- ---------------------------------------------------------------------->
