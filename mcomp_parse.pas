@@ -31,7 +31,6 @@ begin
 }
   code_lib_def (inicfg);               {init CODE config parameters to default}
   inicfg.mem_p := mem_p;               {use our mem context as parent}
-  inicfg.memnam_len := 32;             {max length of mem and adr space names}
   inicfg.symlen_max := 32;             {max length of other symbols}
 
   code_lib_new (inicfg, code_p, stat); {start new use of the CODE library}
