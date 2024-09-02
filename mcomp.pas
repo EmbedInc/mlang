@@ -204,11 +204,11 @@ done_opts:                             {done with all the command line options}
   sys_error_abort (stat, '', '', nil, 0);
 
 
-  writeln;
+  writeln;                             {show memory symbols}
   code_memsym_show_all (code_p^, 0);
 
-
-
+  writeln;                             {show tree of symbols}
+  code_scope_show (code_p^, code_p^.scope_root, 0);
 
 abort1:                                {jump here to leave with FLINE library open}
   fline_lib_end (fl_p);                {end this use of the FLINE library}
