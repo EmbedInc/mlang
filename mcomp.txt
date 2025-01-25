@@ -1,5 +1,5 @@
                            Embed program MCOMP
-                              21 August 2022
+                             25 January 2025
 
 mcomp [options]
 
@@ -27,5 +27,14 @@ language.  The command line parameters are:
 
   -TREE
 
-    Show the syntax tree on STDOUT after parsing each statement.  The
-    purpose is to aid in debugging.
+    Show the syntax tree on STDOUT after parsing each statement.  No
+    compilation is performed.
+
+  -SYM
+
+    Show the symbols tree resulting from parsing the input file.  No
+    compilation is performed.
+
+  -MEM
+
+    Show the memory configuration.  No compilation is performed.

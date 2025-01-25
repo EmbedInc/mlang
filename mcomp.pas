@@ -17,6 +17,9 @@ var
   iname_set: boolean;                  {TRUE if the input file name already set}
   pre_only: boolean;                   {pre-process only}
   showver: boolean;                    {show the program version}
+  show_sym: boolean;                   {show symbols resulting from parsing}
+  show_mem: boolean;                   {show memory configuration}
+  docomp: boolean;                     {do compilation}
 
   opt:                                 {upcased command line option}
     %include '(cog)lib/string_treename.ins.pas';
@@ -38,6 +41,8 @@ begin
   iname_set := false;                  {no input file name specified}
   pre_only := false;                   {init to do full compile}
   showver := false;                    {init to not show program version}
+  show_sym := false;                   {init to not show symbols from parsing}
+  docomp := true;                      {init to do compilation}
 
   show_tree := false;                  {init to not show syn tree each statement}
 {
@@ -58,7 +63,7 @@ next_opt:
     end;
   string_upcase (opt);                 {make upper case for matching list}
   string_tkpick80 (opt,                {pick command line option name from list}
-    '-IN -PRE -V -TREE',
+    '-IN -PRE -V -TREE -SYM -MEM',
     pick);                             {number of keyword picked from list}
   case pick of                         {do routine for specific option}
 {
@@ -78,18 +83,35 @@ next_opt:
 }
 2: begin
   pre_only := true;                    {indicate to only do pre-processing}
+  docomp := false;
   end;
 {
 *   -V
 }
 3: begin
   showver := true;                     {show program version}
+  docomp := false;
   end;
 {
 *   -TREE
 }
 4: begin
   show_tree := true;                   {show syntax tree each statement}
+  docomp := false;
+  end;
+{
+*   -SYM
+}
+5: begin
+  show_sym := true;                    {show symbols resulting from parsing input}
+  docomp := false;
+  end;
+{
+*   -MEM
+}
+6: begin
+  show_mem := true;                    {show memory config defined in input file}
+  docomp := false;
   end;
 {
 *   Unrecognized command line option.
@@ -203,12 +225,17 @@ done_opts:                             {done with all the command line options}
   mcomp_parse (coll_p^, stat);         {parse the pre-processed collection of lines}
   sys_error_abort (stat, '', '', nil, 0);
 
+  if show_mem then begin               {show memory configuration ?}
+    writeln;
+    code_memsym_show_all (code_p^, 0);
+    end;
 
-  writeln;                             {show memory symbols}
-  code_memsym_show_all (code_p^, 0);
+  if show_sym then begin
+    writeln;                           {show tree of symbols ?}
+    code_scope_show (code_p^, code_p^.scope_root, 0);
+    end;
 
-  writeln;                             {show tree of symbols}
-  code_scope_show (code_p^, code_p^.scope_root, 0);
+  if not docomp then goto abort1;      {don't do compilation step ?}
 
 abort1:                                {jump here to leave with FLINE library open}
   fline_lib_end (fl_p);                {end this use of the FLINE library}
