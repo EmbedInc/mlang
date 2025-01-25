@@ -7,4 +7,5 @@ rem
 setlocal
 call build_pasinit
 
-call "%sourcedir%\build_mcomp_prog"
+call src_syn mlang
+src_progl mcomp -link mlang.obj

@@ -11,9 +11,6 @@ const
 var
   fnam_in:                             {input file name}
     %include '(cog)lib/string_treename.ins.pas';
-  e_p: escr_p_t;                       {points to scripting system use state}
-  fl_p: fline_p_t;                     {points to FLINE library use state}
-  coll_p: fline_coll_p_t;              {points to the preprocessor output lines}
   iname_set: boolean;                  {TRUE if the input file name already set}
   pre_only: boolean;                   {pre-process only}
   showver: boolean;                    {show the program version}
@@ -44,7 +41,7 @@ begin
   show_sym := false;                   {init to not show symbols from parsing}
   docomp := true;                      {init to do compilation}
 
-  show_tree := false;                  {init to not show syn tree each statement}
+  mcomp_global_init (util_top_mem_context); {init global program state}
 {
 *   Back here each new command line option.
 }
@@ -141,87 +138,21 @@ done_opts:                             {done with all the command line options}
     sys_message_bomb ('string', 'cmline_input_fnam_missing', nil, 0);
     end;
 {
-*   Init the global variables.
+*   Pre-process the source file into the collection of lines COLL_P^.
 }
-  util_mem_context_get (util_top_mem_context, mem_p); {create our mem context}
-{
-*   Configure the ESCR scripting system for our use.
-}
-  escr_open (                          {create new use of the ESCR scripting system}
-    mem_p^,                            {parent memory context, will make subordinate}
-    e_p,                               {returned pointer to script system state}
-    stat);
-  sys_error_abort (stat, 'escr', 'open', nil, 0);
-
-  escr_set_preproc (e_p^, true);       {set preprocessor mode, not script mode}
-
-  escr_set_incsuff (e_p^, '.m'(0));    {special suffixes required for include files}
-
-  string_vstring (e_p^.cmdst, '#', 1); {special sequence to start a script command}
-
-  escr_commdat_clear (e_p^);           {clear any default data file comment delimiters}
-  escr_commdat_add (                   {add M source comment identifier}
-    e_p^,                              {scripting system state}
-    string_v(''''(0)),                 {comment start identifier}
-    string_v(''(0)),                   {comment ends at end of line}
-    stat);
+  mcomp_pre (fnam_in, stat);           {do the pre-processing}
   sys_error_abort (stat, '', '', nil, 0);
 
-  escr_commscr_clear (e_p^);           {clear any default preproc comment delimiters}
-  escr_commscr_add (                   {add preprocessor comment identifier}
-    e_p^,                              {scripting system state}
-    string_v('//'(0)),                 {comment start identifier}
-    string_v(''(0)),                   {comment ends at end of line}
-    stat);
-  sys_error_abort (stat, '', '', nil, 0);
-
-  escr_syexcl_clear (e_p^);            {clear any default syntax exclusions}
-  escr_syexcl_add (                    {add exclusion for double quoted strings}
-    e_p^,                              {state for this use of the ESCR system}
-    string_v('"'),                     {quoted string start}
-    string_v('"'),                     {quoted string end}
-    stat);
-  sys_error_abort (stat, '', '', nil, 0);
-
-  escr_quotesyn_clear (e_p^);          {clear existing quoted string syntaxes}
-  escr_quotesyn_add (e_p^, '"', '"');  {quoted strings start/end with quote chars}
-
-  string_vstring (e_p^.syfunc.st, '{', 1); {set function start/end identification}
-  string_vstring (e_p^.syfunc.en, '}', 1);
-
-  fline_coll_new_lmem (                {create object to hold preprocessed source}
-    e_p^.fline_p^,                     {FLINE library use state}
-    string_v('M-postprocessed'(0)),    {name of the collection of lines}
-    coll_p);                           {returned pointer to the collection structure}
-  escr_out_to_coll (                   {route output lines to memory}
-    e_p^,                              {scripting system state}
-    coll_p^);                          {where to write output lines to}
-{
-*   Do the pre-processing.
-}
-  escr_run_file (                      {run the preprocessor on the input file}
-    e_p^,                              {scripting system state}
-    fnam_in, '.m',                     {input file name and allowed suffixes}
-    stat);
-  sys_error_abort (stat, '', '', nil, 0);
-
-  escr_close_keep_lines (              {end this use of preprocessor, keep output}
-    e_p,                               {pointer to scripting system state, returned NIL}
-    fl_p);                             {returned pointer to FLINE lib use state}
-{
-*   The preprocessor output is the collection of lines pointed to by COLL_P,
-*   under the FLINE library use pointed to by FL_P.
-}
   if pre_only then begin               {pre-process only ?}
     mcomp_dbg_coll (coll_p^);          {show the data in the postprocessed collection}
     goto abort1;
     end;
-
-  mcomp_comm_init (coll_p^);           {init comment system}
 {
 *   Parse the pre-processed result and build the in-memory structures
 *   representing the code.
 }
+  mcomp_comm_init (coll_p^);           {init comment system}
+
   mcomp_parse (coll_p^, stat);         {parse the pre-processed collection of lines}
   sys_error_abort (stat, '', '', nil, 0);
 
@@ -238,5 +169,5 @@ done_opts:                             {done with all the command line options}
   if not docomp then goto abort1;      {don't do compilation step ?}
 
 abort1:                                {jump here to leave with FLINE library open}
-  fline_lib_end (fl_p);                {end this use of the FLINE library}
+  mcomp_global_end;                    {end use of global state, release resources}
   end.

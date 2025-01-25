@@ -20,8 +20,10 @@ const
 
 var (mcomp_com)
   mem_p: util_mem_context_p_t;         {mem context for this run of program}
-  syn_p: syn_p_t;                      {SYN library use state}
-  code_p: code_p_t;                    {CODE library use state}
+  fline_p: fline_p_t;                  {to FLINE library use state}
+  coll_p: fline_coll_p_t;              {to preprocessor output lines to parse}
+  syn_p: syn_p_t;                      {to SYN library use state}
+  code_p: code_p_t;                    {to CODE library use state}
   currlevel: sys_int_machine_t;        {current block nesting level, 0 = top}
   nextlevel: sys_int_machine_t;        {lev of next statement}
   errsyn: boolean;                     {syntax error, doing error reparse}
@@ -54,6 +56,13 @@ procedure mcomp_err_atline (           {show error, source line, and bomb progra
   in      n_parms: sys_int_machine_t); {number of parameters in PARMS}
   options (val_param, extern, noreturn);
 
+procedure mcomp_global_end;            {end use of global state, release resources}
+  val_param; extern;
+
+procedure mcomp_global_init (          {init global MCOMP program state}
+  in out  mem: util_mem_context_t);    {parent mem context, will create subordinate}
+  val_param; extern;
+
 procedure mcomp_mem_perm (             {get new memory, can't deallocate later}
   in      size: sys_int_adr_t;         {min size of new memory, bytes}
   out     new_p: univ_ptr);            {returned pointer to the new memory}
@@ -61,6 +70,11 @@ procedure mcomp_mem_perm (             {get new memory, can't deallocate later}
 
 procedure mcomp_parse (                {parse input, build in-memory structures}
   in var  coll: fline_coll_t;          {collection of text lines to parse}
+  out     stat: sys_err_t);            {completion status}
+  val_param; extern;
+
+procedure mcomp_pre (                  {pre-process raw input into COLL_p^}
+  in      fnam: univ string_var_arg_t; {top level source file to pre-process}
   out     stat: sys_err_t);            {completion status}
   val_param; extern;
 

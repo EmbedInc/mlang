@@ -1,9 +1,0 @@
-mcomp_comm.obj
-mcomp_dbg.obj
-mcomp_err.obj
-mcomp_mem.obj
-mcomp_parse.obj
-mcomp_syn.obj
-mcomp_syt.obj
-mcomp_syt_memadr.obj
-mlang.obj
