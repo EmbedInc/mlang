@@ -11,6 +11,7 @@
 %include 'code.ins.pas';
 
 const
+  symlen_max = 32;                     {max allowed length of symbol names}
   {
   *   Special values for comment levels.  Normal nesting levels are 0-N.
   }
@@ -68,12 +69,10 @@ procedure mcomp_mem_perm (             {get new memory, can't deallocate later}
   out     new_p: univ_ptr);            {returned pointer to the new memory}
   val_param; extern;
 
-procedure mcomp_parse (                {parse input, build in-memory structures}
-  in var  coll: fline_coll_t;          {collection of text lines to parse}
-  out     stat: sys_err_t);            {completion status}
+procedure mcomp_parse;                 {parse all lines at COLL_P}
   val_param; extern;
 
-procedure mcomp_pre (                  {pre-process raw input into COLL_p^}
+procedure mcomp_pre (                  {pre-process raw input into COLL_P^}
   in      fnam: univ string_var_arg_t; {top level source file to pre-process}
   out     stat: sys_err_t);            {completion status}
   val_param; extern;

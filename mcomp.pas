@@ -151,10 +151,7 @@ done_opts:                             {done with all the command line options}
 *   Parse the pre-processed result and build the in-memory structures
 *   representing the code.
 }
-  mcomp_comm_init (coll_p^);           {init comment system}
-
-  mcomp_parse (coll_p^, stat);         {parse the pre-processed collection of lines}
-  sys_error_abort (stat, '', '', nil, 0);
+  mcomp_parse;                         {parse input, build resulting structures}
 
   if show_mem then begin               {show memory configuration ?}
     writeln;
