@@ -50,7 +50,8 @@ begin
 *
 *   Function MCOMP_SYT_INTEGER
 *
-*   Interpret the INTEGER syntax and return the resulting value.
+*   Interpret the INTEGER syntax at the current tag and return the resulting
+*   value.  The syntax tree position is not moved.
 }
 function mcomp_syt_integer             {interpret INTEGER syntax}
   :sys_int_max_t;
