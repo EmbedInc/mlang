@@ -60,7 +60,6 @@
     )
 
 .define statement .as
-  stlevel                              /* skip over indentation, get nesting level
   .eod[1] .or (
     ("memory" space memory_[2]) .or
     ("memregion" space memregion_[3]) .or

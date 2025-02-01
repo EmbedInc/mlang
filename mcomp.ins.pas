@@ -27,6 +27,7 @@ var (mcomp_com)
   code_p: code_p_t;                    {to CODE library use state}
   currlevel: sys_int_machine_t;        {current block nesting level, 0 = top}
   nextlevel: sys_int_machine_t;        {lev of next statement}
+  nextlev_set: boolean;                {at start of new statement, NEXTLEVEL set}
   errsyn: boolean;                     {syntax error, doing error reparse}
   show_tree: boolean;                  {show syntax tree each statement, for debugging}
 {
@@ -72,12 +73,26 @@ procedure mcomp_mem_perm (             {get new memory, can't deallocate later}
 procedure mcomp_parse;                 {parse all lines at COLL_P}
   val_param; extern;
 
+function mcomp_parse_getlevel          {get nesting level of next statement}
+  :sys_int_machine_t;                  {statement nesting level, 0 = top}
+  val_param; extern;
+
+function mcomp_parse_statement (       {parse one statement at curr nesting level}
+  in      syfunc_p: syn_parsefunc_p_t) {statement syntax parsing routine}
+  :boolean;                            {statement parsed, syntax tree built}
+  val_param; extern;
+
 procedure mcomp_pre (                  {pre-process raw input into COLL_P^}
   in      fnam: univ string_var_arg_t; {top level source file to pre-process}
   out     stat: sys_err_t);            {completion status}
   val_param; extern;
 
-function mcomp_syn_statement (         {parse one top level statement}
+function mcomp_syn_statement (         {parse routine for top level statement}
+  in out  syn: syn_t)
+  :boolean;
+  val_param; extern;
+
+function mcomp_syn_stlevel (           {parse routine to find level of next statement}
   in out  syn: syn_t)
   :boolean;
   val_param; extern;

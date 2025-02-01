@@ -25,6 +25,7 @@ begin
   code_p := nil;
   currlevel := 0;
   nextlevel := 0;
+  nextlev_set := false;
   errsyn := false;
   show_tree := false;
   end;

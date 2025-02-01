@@ -1,6 +1,8 @@
 {   Routines for parsing the pre-processed input.
 }
 module mcomp_parse;
+define mcomp_parse_getlevel;
+define mcomp_parse_statement;
 define mcomp_parse;
 %include 'mcomp.ins.pas';
 {
@@ -33,7 +35,7 @@ begin
     sys_error_abort (stat, '', '', nil, 0);
     end;
 
-  currlevel := 0;                      {init current block nesting level}
+  nextlev_set := false;                {level of next line not known yet}
 
   if show_tree then begin              {will be showing syntax trees ?}
     writeln;                           {insure blank line before first tree listing}
@@ -56,18 +58,69 @@ begin
 {
 ********************************************************************************
 *
-*   Local subroutine MCOMP_PARSE_TOPLEV
+*   Function MCOMP_PARSE_GETLEVEL
 *
-*   Parse one top level syntax construction.  The global variable ERRSYN is
-*   left indicating whether a syntax error was found.
+*   Returns the nesting level of the next statement.  The current input stream
+*   position will be left at the first content character of the next statement.
+*
+*   This routine can be called either at the start of a new line, or after it
+*   was previously called with no other parsing haven taken place since.  In the
+*   second case, the the cached value from when this routine was called at the
+*   start of a line is returned.
 }
-procedure mcomp_parse_toplev;
-  val_param; internal;
+function mcomp_parse_getlevel          {get nesting level of next statement}
+  :sys_int_machine_t;                  {statement nesting level, 0 = top}
+  val_param;
 
 begin
+  if nextlev_set then begin            {already found next level previously ?}
+    mcomp_parse_getlevel := nextlevel; {returne the previously-found level}
+    end;
+
+  discard( syn_parse_next (            {call parse routine to find statement start}
+    syn_p^,                            {SYN library use state}
+    addr(mcomp_syn_stlevel))           {parsing routine to call, sets NEXTLEVEL}
+    );
+  mcomp_parse_getlevel := nextlevel;   {return the nesting level of this new statement}
+  end;
+{
+********************************************************************************
+*
+*   Function MCOMP_PARSE_STATEMENT (PARSEFUNC)
+*
+*   Parse one statement at the current level.  The routine returns without
+*   parsing the statement if it is at a higher nesting level then current.  It
+*   is an error if the next statement is at a lower level than current.
+*
+*   The function returns TRUE if the statement was parsed and a syntax tree
+*   built.  It returns FALSE when the statement was at a higher level and
+*   nothing was therefore parsed.
+}
+function mcomp_parse_statement (       {parse one statement at curr nesting level}
+  in      syfunc_p: syn_parsefunc_p_t) {statement syntax parsing routine}
+  :boolean;                            {statement parsed, syntax tree built}
+  val_param;
+
+var
+  level: sys_int_machine_t;            {nesting level of next statement}
+
+begin
+  mcomp_parse_statement := false;      {init to statement not parsed}
+  level := mcomp_parse_getlevel;       {get nesting level of next statement}
+  if level < currlevel then return;    {next statement is at a higher level ?}
+
+  if level <> currlevel then begin     {unexpected subordinate statement ?}
+    mcomp_err_atline (                 {bomb with error showing subordinate statement}
+      '', 'statement_subordinate', nil, 0);
+    end;
+{
+*   This statement is at the expected nesting level.
+}
+  nextlev_set := false;                {reset to level of next statement not known}
+
   errsyn := not syn_parse_next (       {parse statement, build syntax tree}
     syn_p^,                            {SYN library use state}
-    addr(mcomp_syn_statement));        {top level parsing routine}
+    syfunc_p);                         {routine for statement syntax construction}
   if errsyn then begin                 {syntax error ?}
     syn_parse_err_reparse (syn_p^);    {build syntax tree up to error}
     end;
@@ -83,7 +136,7 @@ begin
     writeln;
     end;
 
-  mcomp_syt_statement;                 {process syntax tree for STATEMENT}
+  mcomp_parse_statement := true;       {indicate statement parsed, syntax tree built}
   end;
 {
 ********************************************************************************
@@ -104,8 +157,11 @@ procedure mcomp_parse;                 {parse all lines at COLL_P}
 begin
   mcomp_parse_start;                   {one-time setup for parsing input collection}
 
+  currlevel := 0;                      {at top statement nesting level}
   while true do begin                  {loop over each statement}
-    mcomp_parse_toplev;                {parse one top level syntax construction}
+    if mcomp_parse_statement (addr(mcomp_syn_statement)) then begin {parse statement}
+      mcomp_syt_statement;             {process syntax tree of the statement}
+      end;
     if errsyn then exit;               {don't continue after error}
     if syn_parse_end(syn_p^) then exit; {hit end of input ?}
     end;                               {back to do next statement}

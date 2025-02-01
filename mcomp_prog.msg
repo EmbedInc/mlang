@@ -62,3 +62,6 @@ msg memreg_opt_bad
 msg statement_bad
   lan english -def
     Invalid statement.
+msg statement_subordinate
+  lan english -def
+    A subordinate statement is not allowed here.
