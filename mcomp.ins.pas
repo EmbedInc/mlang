@@ -19,6 +19,14 @@ const
   mcomp_cmlev_blank_k = -2;            {blank line, no comment start char}
   mcomp_cmlev_none_k = -3;             {no comment defined}
 
+type
+  mcomp_level_p_t = ^mcomp_level_t;
+  mcomp_level_t = record               {info about each parent statement level}
+    prev_p: mcomp_level_p_t;           {to next higher level, NIL at top}
+    level: sys_int_machine_t;          {nesting level, 0 at top}
+    pos: fline_cpos_t;                 {parent statement start position}
+    end;
+
 var (mcomp_com)
   mem_p: util_mem_context_p_t;         {mem context for this run of program}
   fline_p: fline_p_t;                  {to FLINE library use state}
@@ -26,6 +34,8 @@ var (mcomp_com)
   syn_p: syn_p_t;                      {to SYN library use state}
   code_p: code_p_t;                    {to CODE library use state}
   currlevel: sys_int_machine_t;        {current block nesting level, 0 = top}
+  level_p: mcomp_level_p_t;            {to data for current statement block}
+  level_unused_p: mcomp_level_p_t;     {to chain of unused block level descriptors}
   nextlevel: sys_int_machine_t;        {lev of next statement}
   nextlev_set: boolean;                {at start of new statement, NEXTLEVEL set}
   errsyn: boolean;                     {syntax error, doing error reparse}
@@ -63,6 +73,15 @@ procedure mcomp_global_end;            {end use of global state, release resourc
 
 procedure mcomp_global_init (          {init global MCOMP program state}
   in out  mem: util_mem_context_t);    {parent mem context, will create subordinate}
+  val_param; extern;
+
+procedure mcomp_level_none;            {set above all levels, next statement top level}
+  val_param; extern;
+
+procedure mcomp_level_pop;             {pop up to parent statements level}
+  val_param; extern;
+
+procedure mcomp_level_push;            {enter subordinate statements level}
   val_param; extern;
 
 procedure mcomp_mem_perm (             {get new memory, can't deallocate later}

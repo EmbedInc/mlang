@@ -23,7 +23,9 @@ begin
   coll_p := nil;
   syn_p := nil;
   code_p := nil;
-  currlevel := 0;
+  currlevel := -1;
+  level_p := nil;
+  level_unused_p := nil;
   nextlevel := 0;
   nextlev_set := false;
   errsyn := false;

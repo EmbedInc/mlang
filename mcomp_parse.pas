@@ -107,6 +107,9 @@ var
 begin
   mcomp_parse_statement := false;      {init to statement not parsed}
   level := mcomp_parse_getlevel;       {get nesting level of next statement}
+  if level_p = nil then begin          {currently above all levels ?}
+    mcomp_level_push;                  {to top level}
+    end;
   if level < currlevel then return;    {next statement is at a higher level ?}
 
   if level <> currlevel then begin     {unexpected subordinate statement ?}
@@ -157,8 +160,8 @@ procedure mcomp_parse;                 {parse all lines at COLL_P}
 begin
   mcomp_parse_start;                   {one-time setup for parsing input collection}
 
-  currlevel := 0;                      {at top statement nesting level}
   while true do begin                  {loop over each statement}
+    mcomp_level_none;                  {init to level above top level statements}
     if mcomp_parse_statement (addr(mcomp_syn_statement)) then begin {parse statement}
       mcomp_syt_statement;             {process syntax tree of the statement}
       end;
