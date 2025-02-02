@@ -23,6 +23,8 @@
 module mcomp_level;
 define mcomp_level;
 define mcomp_level_set;
+define mcomp_level_exp_down;
+define mcomp_level_exp_up;
 %include 'mcomp.ins.pas';
 {
 ********************************************************************************
@@ -199,4 +201,35 @@ error:
   writeln;
   writeln ('INTERNAL ERROR: Attempt to jump down more than one level in MCOMP_LEVEL_SET.');
   mcomp_err_atline ('', '', nil, 0);   {bomb program showing current parse position}
+  end;
+{
+********************************************************************************
+*
+*   Subroutine MCOMP_LEVEL_EXP_DOWN
+*
+*   Set the level of expected statements one level down into a block.
+}
+procedure mcomp_level_exp_down;        {set expected statement one level down into block}
+  val_param;
+
+begin
+  if currlevel < 0
+    then currlevel := 0
+    else currlevel := currlevel + 1;
+  end;
+{
+********************************************************************************
+*
+*   Subroutine MCOMP_LEVEL_EXP_UP
+*
+*   Set the level of expected statements one level up, which is back to the
+*   level of the parent of the current block.
+}
+procedure mcomp_level_exp_up;          {set expected statement one level up, back to parent}
+  val_param;
+
+begin
+  if currlevel <= 0
+    then currlevel := -1
+    else currlevel := currlevel - 1;
   end;

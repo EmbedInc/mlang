@@ -3,6 +3,7 @@
 module mcomp_parse;
 define mcomp_parse_getlevel;
 define mcomp_parse_statement;
+define mcomp_parse_block;
 define mcomp_parse;
 %include 'mcomp.ins.pas';
 {
@@ -141,6 +142,41 @@ begin
     end;
 
   mcomp_parse_statement := true;       {indicate statement parsed, syntax tree built}
+  end;
+{
+********************************************************************************
+*
+*   Subroutine MCOMP_PARSE_BLOCK (SYFUNC_P, TREEWALK_P)
+*
+*   Parse and process all the statements in a block.  SYFUNC_P points to the
+*   syntax parsing function to parse each statement.  TREEWALK_P points to the
+*   routine to walk and process the resulting syntax tree.
+*
+*   This routine returns when the next statement is at a higher level than the
+*   statements in the block.  The expected statement level must be at that of
+*   the parent statement of the block, and will be restored to that before exit.
+}
+procedure mcomp_parse_block (          {parse and process all substatements in a block}
+  in      syfunc_p: syn_parsefunc_p_t; {sub-statement syntax parsing routine}
+  in      treewalk_p: mcomp_treewalk_p_t); {syntax tree walking routine}
+  val_param;
+
+begin
+  mcomp_level_exp_down;                {expect statements down one level}
+
+  while true do begin                  {back here after each statement in block}
+    if mcomp_parse_statement(syfunc_p) {parse statement at inside block level}
+      then begin                       {statement parsed, syntax tree built}
+        treewalk_p^;                   {process the data on the syntax tree}
+        end
+      else begin                       {statement is at higher level}
+        exit;
+        end
+      ;
+    if errsyn then exit;               {don't continue after error}
+    end;                               {back to do next statement}
+
+  mcomp_level_exp_up;                  {back up to level of block start statement}
   end;
 {
 ********************************************************************************

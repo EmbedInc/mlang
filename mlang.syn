@@ -18,9 +18,9 @@
 .symbol adrregion_
 .symbol set_
 /*
-/*   Syntax constructions that sub-statements.  These are intended to be called
-/*   separately for each sub-statement by the code interpreting the syntax.
-/*   They therefore need to have externally known names
+/*   Syntax constructions that are sub-statements.  These are intended to be
+/*   called separately for each sub-statement by the code interpreting the
+/*   syntax.  They therefore need to have externally known names
 /*
 .symbol type_sub[mcomp_syn_type]       /* substatement in TYPE block
 

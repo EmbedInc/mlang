@@ -69,3 +69,12 @@ msg statement_err
 msg statement_subordinate
   lan english -def
     A subordinate statement is not allowed here.
+msg type_bad
+  lan english -def
+    Invalid TYPE statement.
+msg type_def_bad
+  lan english -def
+    Not a valid data type definition or reference.
+msg type_name_bad
+  lan english -def
+    Not a valid data type name.

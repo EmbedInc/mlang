@@ -20,12 +20,21 @@ const
   mcomp_cmlev_none_k = -3;             {no comment defined}
 
 type
+  mcomp_name_t = record                {var string to hold unqualified symbol name}
+    max: string_index_t;
+    len: string_index_t;
+    str: array[1..symlen_max] of char;
+    end;
+
   mcomp_level_p_t = ^mcomp_level_t;
   mcomp_level_t = record               {info about each parent statement level}
     prev_p: mcomp_level_p_t;           {to next higher level, NIL at top}
     level: sys_int_machine_t;          {nesting level, 0 at top}
     pos: fline_cpos_t;                 {parent statement start position}
     end;
+
+  mcomp_treewalk_p_t = ^procedure;     {to subroutine to walk syntax tree}
+    val_param;
 
 var (mcomp_com)
   mem_p: util_mem_context_p_t;         {mem context for this run of program}
@@ -78,6 +87,12 @@ function mcomp_level                   {get nesting level of statement currently
   :sys_int_machine_t;                  {nesting level, 0 in top level statement}
   val_param; extern;
 
+procedure mcomp_level_exp_down;        {set expected statement one level down into block}
+  val_param; extern;
+
+procedure mcomp_level_exp_up;          {set expected statement one level up, back to parent}
+  val_param; extern;
+
 procedure mcomp_level_set (            {update nested levels state to curr position}
   in      level: sys_int_machine_t);   {nesting level of the statement at start of}
   val_param; extern;
@@ -88,6 +103,11 @@ procedure mcomp_mem_perm (             {get new memory, can't deallocate later}
   val_param; extern;
 
 procedure mcomp_parse;                 {parse all lines at COLL_P}
+  val_param; extern;
+
+procedure mcomp_parse_block (          {parse and process all substatements in a block}
+  in      syfunc_p: syn_parsefunc_p_t; {sub-statement syntax parsing routine}
+  in      treewalk_p: mcomp_treewalk_p_t); {syntax tree walking routine}
   val_param; extern;
 
 function mcomp_parse_getlevel          {get nesting level of next statement}
@@ -114,9 +134,18 @@ function mcomp_syn_stlevel (           {parse routine to find level of next stat
   :boolean;
   val_param; extern;
 
+function mcomp_syn_type (              {parse routine for TYPE block substatement}
+  in out  syn: syn_t)
+  :boolean;
+  val_param; extern;
+
 procedure mcomp_syt_accesstype (       {interpret ACCESSTYPE syntax}
   in out  accs: code_memaccs_t;        {access list to update}
   in      parent: code_memaccs_t);     {parent code accsibutes}
+  val_param; extern;
+
+procedure mcomp_syt_dtype (            {process DTYPE syntax}
+  out     dtype_p: code_dtype_p_t);    {returned pointer to resulting data type}
   val_param; extern;
 
 function mcomp_syt_integer             {interpret INTEGER syntax}
