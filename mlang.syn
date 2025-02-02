@@ -7,6 +7,7 @@
 .symbol integer                        /* Embed integer, B#DDDDDDD
 .symbol expression                     /* arbitrary expression that resolves to a value
 .symbol accesstype                     /* memory access type
+.symbol dtype                          /* data type definition or reference
 .symbol statement[mcomp_syn_statement] /* one top level statement
 /*
 /*   Parts of statements without their leading keyword.
@@ -16,7 +17,13 @@
 .symbol adrspace_
 .symbol adrregion_
 .symbol set_
-.symbol type_
+/*
+/*   Syntax constructions that sub-statements.  These are intended to be called
+/*   separately for each sub-statement by the code interpreting the syntax.
+/*   They therefore need to have externally known names
+/*
+.symbol type_sub[mcomp_syn_type]       /* substatement in TYPE block
+
 
 .define name .as                       /* bare symbol name
   .charcase [upper]
@@ -58,6 +65,14 @@
       )
     )
 
+.define dtype .as
+  ("integer"[2] space (
+      "signed"[1] .or
+      ("bits" space integer[2]) .or
+      ("bitsexact" space integer[3]))
+    ) .or
+  qname[1]
+
 .define statement .as
   .eod[1] .or (
     ("memory" space memory_[2]) .or
@@ -65,7 +80,7 @@
     ("adrspace" space adrspace_[4]) .or
     ("adrregion" space adrregion_[5]) .or
     ("set" space set_[6]) .or
-    ("type" space type_[7]) .or
+    "type"[7] .or
     set_[6]
     )
   pad .eol
@@ -114,6 +129,8 @@
 
 .define set_ .as
   qname[1] pad "<<" pad expression[1]
-
-.define type_ .as
-  name[1]                              /* placeholder for now
+/*
+/*   Substatements within specific blocks.
+/*
+.define type_sub .as
+  name[1] space dtype[1]

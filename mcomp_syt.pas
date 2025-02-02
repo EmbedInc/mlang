@@ -185,6 +185,9 @@ begin
       end;
 6:  begin                              {SET (assignment)}
       end;
+7:  begin                              {TYPE statement block}
+      mcomp_syt_type_;
+      end;
 otherwise                              {unexpected tag}
     syn_msg_tag_bomb (syn_p^, 'mcomp_prog', 'statement_bad', nil, 0);
     end;

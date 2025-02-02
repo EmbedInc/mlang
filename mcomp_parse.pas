@@ -35,7 +35,7 @@ begin
     sys_error_abort (stat, '', '', nil, 0);
     end;
 
-  nextlev_set := false;                {level of next line not known yet}
+  level_set := false;                  {level of next line not known yet}
 
   if show_tree then begin              {will be showing syntax trees ?}
     writeln;                           {insure blank line before first tree listing}
@@ -73,24 +73,24 @@ function mcomp_parse_getlevel          {get nesting level of next statement}
   val_param;
 
 begin
-  if nextlev_set then begin            {already found next level previously ?}
-    mcomp_parse_getlevel := nextlevel; {returne the previously-found level}
+  if not level_set then begin          {level of next statement not already found ?}
+    discard( syn_parse_next (          {call parse routine to find statement start}
+      syn_p^,                          {SYN library use state}
+      addr(mcomp_syn_stlevel))         {parsing routine to call, updates levels state}
+      );
     end;
 
-  discard( syn_parse_next (            {call parse routine to find statement start}
-    syn_p^,                            {SYN library use state}
-    addr(mcomp_syn_stlevel))           {parsing routine to call, sets NEXTLEVEL}
-    );
-  mcomp_parse_getlevel := nextlevel;   {return the nesting level of this new statement}
+  mcomp_parse_getlevel := level_p^.level; {return the level of the next statement}
   end;
 {
 ********************************************************************************
 *
 *   Function MCOMP_PARSE_STATEMENT (PARSEFUNC)
 *
-*   Parse one statement at the current level.  The routine returns without
-*   parsing the statement if it is at a higher nesting level then current.  It
-*   is an error if the next statement is at a lower level than current.
+*   Parse one statement at the current level as indicated by CURRLEVEL.  The
+*   routine returns without parsing the statement if it is at a higher nesting
+*   level then current.  It is an error if the next statement is at a lower
+*   level than current.
 *
 *   The function returns TRUE if the statement was parsed and a syntax tree
 *   built.  It returns FALSE when the statement was at a higher level and
@@ -105,11 +105,12 @@ var
   level: sys_int_machine_t;            {nesting level of next statement}
 
 begin
+  if errsyn then begin                 {there was a previous syntax error ?}
+    mcomp_err_atline ('', 'statement_err', nil, 0); {bomb program with error message}
+    end;
+
   mcomp_parse_statement := false;      {init to statement not parsed}
   level := mcomp_parse_getlevel;       {get nesting level of next statement}
-  if level_p = nil then begin          {currently above all levels ?}
-    mcomp_level_push;                  {to top level}
-    end;
   if level < currlevel then return;    {next statement is at a higher level ?}
 
   if level <> currlevel then begin     {unexpected subordinate statement ?}
@@ -119,7 +120,7 @@ begin
 {
 *   This statement is at the expected nesting level.
 }
-  nextlev_set := false;                {reset to level of next statement not known}
+  level_set := false;                  {reset to level of next statement not known}
 
   errsyn := not syn_parse_next (       {parse statement, build syntax tree}
     syn_p^,                            {SYN library use state}
@@ -160,8 +161,8 @@ procedure mcomp_parse;                 {parse all lines at COLL_P}
 begin
   mcomp_parse_start;                   {one-time setup for parsing input collection}
 
+  currlevel := 0;                      {indicate expected level of next statement}
   while true do begin                  {loop over each statement}
-    mcomp_level_none;                  {init to level above top level statements}
     if mcomp_parse_statement (addr(mcomp_syn_statement)) then begin {parse statement}
       mcomp_syt_statement;             {process syntax tree of the statement}
       end;

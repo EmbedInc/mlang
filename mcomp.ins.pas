@@ -36,8 +36,7 @@ var (mcomp_com)
   currlevel: sys_int_machine_t;        {current block nesting level, 0 = top}
   level_p: mcomp_level_p_t;            {to data for current statement block}
   level_unused_p: mcomp_level_p_t;     {to chain of unused block level descriptors}
-  nextlevel: sys_int_machine_t;        {lev of next statement}
-  nextlev_set: boolean;                {at start of new statement, NEXTLEVEL set}
+  level_set: boolean;                  {LEVEL_P chain set since last parse}
   errsyn: boolean;                     {syntax error, doing error reparse}
   show_tree: boolean;                  {show syntax tree each statement, for debugging}
 {
@@ -75,13 +74,12 @@ procedure mcomp_global_init (          {init global MCOMP program state}
   in out  mem: util_mem_context_t);    {parent mem context, will create subordinate}
   val_param; extern;
 
-procedure mcomp_level_none;            {set above all levels, next statement top level}
+function mcomp_level                   {get nesting level of statement currently in}
+  :sys_int_machine_t;                  {nesting level, 0 in top level statement}
   val_param; extern;
 
-procedure mcomp_level_pop;             {pop up to parent statements level}
-  val_param; extern;
-
-procedure mcomp_level_push;            {enter subordinate statements level}
+procedure mcomp_level_set (            {update nested levels state to curr position}
+  in      level: sys_int_machine_t);   {nesting level of the statement at start of}
   val_param; extern;
 
 procedure mcomp_mem_perm (             {get new memory, can't deallocate later}
@@ -138,4 +136,7 @@ procedure mcomp_syt_memregion_;        {interpret MEMREGION_ syntax}
   val_param; extern;
 
 procedure mcomp_syt_statement;         {interpret STATEMENT syntax}
+  val_param; extern;
+
+procedure mcomp_syt_type_;             {process TYPE statement block}
   val_param; extern;

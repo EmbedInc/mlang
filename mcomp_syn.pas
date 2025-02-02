@@ -130,7 +130,7 @@ begin
 
     if c = syn_ichar_eol_k then begin  {end of line ?}
       level := next_line_level (syn);  {to start of next line, get nesting level}
-      if level = (currlevel + 2) then begin {new line is continuation of previous ?}
+      if level = (mcomp_level + 2) then begin {new line is continuation of previous ?}
         skip := true;                  {new line counts as separator}
         return;
         end;
@@ -190,17 +190,20 @@ begin
 *   Function MCOMP_SYN_STLEVEL (SYN)
 *
 *   Special parsing function that assumes to start on a new line, and finds the
-*   start of the next text and its nesting level.  The global variable NEXTLEVEL
-*   is set accordingly.  The parsing position will be left at the first real
-*   statement character.
+*   start of the next text and its nesting level.  The global statement parsing
+*   nesting level is updated accordingly.  The parsing position will be left at
+*   the first real statement character.
 }
 function mcomp_syn_stlevel (           {find start of statement, find nesting level}
   in out  syn: syn_t)
   :boolean;
   val_param;
 
+var
+  level: sys_int_machine_t;            {nesting level of next statement}
+
 begin
-  nextlevel := next_line_level (syn);  {to first content char, set NEXTLEVEL}
-  nextlev_set := true;                 {indicate at statement start, NEXTLEVEL set}
+  level := next_line_level (syn);      {to first content char, get nesting level}
+  mcomp_level_set (level);             {update global nested statements state}
   mcomp_syn_stlevel := true;           {this syntax always matches}
   end;

@@ -62,6 +62,10 @@ msg memreg_opt_bad
 msg statement_bad
   lan english -def
     Invalid statement.
+msg statement_err
+  lan english -def
+    INTERNAL ERROR: Attempt to parse a new statement when a syntax error
+    was previously encountered.
 msg statement_subordinate
   lan english -def
     A subordinate statement is not allowed here.

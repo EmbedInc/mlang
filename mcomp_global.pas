@@ -26,8 +26,7 @@ begin
   currlevel := -1;
   level_p := nil;
   level_unused_p := nil;
-  nextlevel := 0;
-  nextlev_set := false;
+  level_set := false;
   errsyn := false;
   show_tree := false;
   end;
