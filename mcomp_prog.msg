@@ -75,6 +75,9 @@ msg type_bad
 msg type_def_bad
   lan english -def
     Not a valid data type definition or reference.
+msg type_int_bad
+  lan english -def
+    Invalid INTEGER data type parameter.
 msg type_name_bad
   lan english -def
     Not a valid data type name.

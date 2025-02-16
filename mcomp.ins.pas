@@ -145,7 +145,7 @@ procedure mcomp_syt_accesstype (       {interpret ACCESSTYPE syntax}
   val_param; extern;
 
 procedure mcomp_syt_dtype (            {process DTYPE syntax}
-  out     dtype_p: code_dtype_p_t);    {returned pointer to resulting data type}
+  out     dtype: code_dtype_t);        {data type to fill in}
   val_param; extern;
 
 function mcomp_syt_integer             {interpret INTEGER syntax}

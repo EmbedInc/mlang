@@ -19,6 +19,7 @@ procedure mcomp_parse_start;           {set up for parsing the lines at COLL_P}
 
 var
   inicfg: code_inicfg_t;               {CODE lib initialization parameters}
+  sym_p: code_symbol_p_t;              {scratch pointer to symbol}
   stat: sys_err_t;                     {completion status}
 
 begin
@@ -34,6 +35,15 @@ begin
 
     code_lib_new (inicfg, code_p, stat); {start new use of the CODE library}
     sys_error_abort (stat, '', '', nil, 0);
+
+    code_sym_curr (                    {create symbol for top level M scope}
+      code_p^,                         {CODE library use state}
+      string_v('M'(0)),                {symbol name}
+      code_symtype_scope_k,            {symbol will be for a scope}
+      sym_p,                           {returned pointer to the new symbol}
+      stat);
+    sys_error_abort (stat, '', '', nil, 0);
+    code_scope_push (code_p^, sym_p^); {down into the new subordinate scope}
     end;
 
   level_set := false;                  {level of next line not known yet}
