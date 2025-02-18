@@ -164,6 +164,11 @@ procedure mcomp_syt_memory_;           {interpret MEMORY_ syntax}
 procedure mcomp_syt_memregion_;        {interpret MEMREGION_ syntax}
   val_param; extern;
 
+procedure mcomp_syt_qname (            {interpret QNAME syntax}
+  in      symtypes: code_symtype_t;    {allowable symbol types}
+  out     sym_p: code_symbol_p_t);     {to symbol, or NIL for not found}
+  val_param; extern;
+
 procedure mcomp_syt_statement;         {interpret STATEMENT syntax}
   val_param; extern;
 

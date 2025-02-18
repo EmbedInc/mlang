@@ -72,6 +72,7 @@ procedure mcomp_syt_dtype (            {process DTYPE syntax}
 
 var
   tag: sys_int_machine_t;              {tagged syntax ID}
+  sym_p: code_symbol_p_t;              {scratch symbol pointer}
 
 label
   have_dtype;
@@ -89,6 +90,13 @@ begin
 *   QNAME.  Tag is name of another data type symbol.
 }
 1: begin
+  mcomp_syt_qname (                    {process QNAME syntax}
+    [code_symtype_dtype_k],            {set of allowable symbol types}
+    sym_p);                            {returned pnt to symbol, NIL = not found}
+
+
+
+
   end;
 {
 *   INTEGER.
