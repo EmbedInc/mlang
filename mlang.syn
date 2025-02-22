@@ -2,10 +2,11 @@
 /*
 .symbol pad[mcomp_syn_pad] external    /* space allowed, comment, wrapped line, etc
 .symbol space[mcomp_syn_space] external /* space or equivalent required
+.symbol letts                          /* string of raw letters, either case
 .symbol name                           /* single bare symbol name
-.symbol namety                         /* symbol name with optional symbol type
-.symbol qname                          /* symbol name that may be qualified
 .symbol integer                        /* Embed integer, B#DDDDDDD
+.symbol qnent                          /* one entry in qualified symbol name
+.symbol qname                          /* symbol name that may be qualified
 .symbol expression                     /* arbitrary expression that resolves to a value
 .symbol accesstype                     /* memory access type
 .symbol dtype                          /* data type definition or reference
@@ -25,6 +26,9 @@
 /*
 .symbol type_sub[mcomp_syn_type]       /* substatement in TYPE block
 
+.define letts .as                      /* sequence of raw letters
+  .charcase [upper]
+  .occurs[1 to inf] .range ["A" thru "Z"]
 
 .define name .as                       /* bare symbol name
   .charcase [upper]
@@ -34,18 +38,6 @@
     .range['0' thru '9'] .or
     "_"
     )
-
-.define namety .as                     /* symbol name with optional symbol type
-  .charcase [upper]
-  name .optional (
-    "%"
-    .occurs[1 to inf] .range['A' thru 'Z']
-    )
-
-.define qname .as                      /* possibly qualified symbol name
-  .optional ":"
-  namety
-  .occurs[0 to inf] (":" namety)
 
 .define integer .as                    /* integer in standard Embed format
   .charcase [upper]
@@ -58,6 +50,16 @@
     .range["0" thru "9"] .or
     .range["A" thru "Z"]
     )
+
+.define qnent .as                      /* one qualified symbol name entry
+  ("-" integer[1]) .or
+  name[2]
+  .optional ("%" letts[3])
+
+.define qname .as                      /* possibly qualified symbol name
+  .optional ":"[1]
+  qnent[2]
+  .occurs[0 to inf] (":" qnent[2])
 
 .define expression .as                 /* arbitrary expression
   integer[1]                           /* temp placeholder

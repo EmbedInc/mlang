@@ -25,13 +25,16 @@ function syt_qnent (                   {process QNENT syntax}
   :boolean;                            {got symbol name, not levels to pop}
   val_param; internal;
 
+label
+  done_tags;
+
 begin
   nup := 0;                            {init to no levels to pop}
   syname.len := 0;                     {init to no symbol name}
   tyname.len := 0;                     {init to no symbol type name}
   syt_qnent := true;                   {init to returning with symbol name}
 
-  if not syn_trav_down (syn_p^) then begin {down into QNENT syntax}
+  if not syn_trav_next_down (syn_p^) then begin {down into QNENT syntax}
     syn_msg_pos_bomb (syn_p^, '', 'qname_ent_bad', nil, 0);
     end;
 
@@ -47,11 +50,12 @@ begin
 3:    begin
         syn_trav_tag_string (syn_p^, tyname); {get the symbol type name}
         end;
-syn_tag_end_k: ;                       {normal syntax end}
+syn_tag_end_k: goto done_tags;         {normal syntax end}
 otherwise
       syn_msg_tag_bomb (syn_p^, '', 'qname_ent_bad', nil, 0);
       end;                             {end of tag cases}
     end;                               {back to get next tag}
+done_tags:                             {done processing all the QNENT tags}
 
   discard( syn_trav_up (syn_p^) );     {back up to parent level}
   end;
@@ -146,13 +150,13 @@ var
   sytypes: code_symtype_t;             {symbol types to look for}
 
 label
-  done_scan;
+  done_tags;
 
 begin
   syname.max := size_char(syname.str); {init local var strings}
   tyname.max := size_char(tyname.str);
 
-  if not syn_trav_down (syn_p^) then begin {down into QNAME syntax}
+  if not syn_trav_next_down (syn_p^) then begin {down into QNAME syntax}
     syn_msg_pos_bomb (syn_p^, '', 'qname_bad', nil, 0);
     end;
 
@@ -171,7 +175,7 @@ begin
             syn_trav_push (syn_p^);    {save syn tree position here}
             if syn_trav_next_tag(syn_p^) = syn_tag_end_k then begin {last entry ?}
               syn_trav_popdel (syn_p^); {delete saved syntax tree position}
-              goto done_scan;          {done scanning the hierarchy syntax}
+              goto done_tags;          {done with all QNAME tags}
               end;
             syn_trav_pop (syn_p^);     {restore syntax tree position}
             update_scope (scope_p, syname, tyname); {update the current scope}
@@ -191,7 +195,7 @@ otherwise
       syn_msg_tag_bomb (syn_p^, '', 'qname_bad', nil, 0);
       end;
     end;                               {back for next name in hierarchy}
-done_scan:                             {done scanning whole QNAME syntax}
+done_tags:                             {done processing all QNAME tags}
 {
 *   The whole QNAME syntax has been scanned.  SYNAME is the final symbol in the
 *   qualified name hiearchy list.  When TYNAME is not empty, then it is the type

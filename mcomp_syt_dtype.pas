@@ -70,14 +70,23 @@ procedure mcomp_syt_dtype (            {process DTYPE syntax}
   out     dtype: code_dtype_t);        {data type to fill in}
   val_param;
 
+const
+  max_msg_args = 1;                    {max arguments we can pass to a message}
+
 var
   tag: sys_int_machine_t;              {tagged syntax ID}
   sym_p: code_symbol_p_t;              {scratch symbol pointer}
+  pos: syn_treepos_t;                  {scratch syntax tree traversing position}
+  name: string_var80_t;                {scratch string}
+  msg_parm:                            {references arguments passed to a message}
+    array[1..max_msg_args] of sys_parm_msg_t;
 
 label
   have_dtype;
 
 begin
+  name.max := size_char(name.str);     {init local var string}
+
   if not syn_trav_next_down (syn_p^) then begin {down into DTYPE syntax}
     syn_msg_pos_bomb (syn_p^, '', 'type_def_bad', nil, 0);
     end;
@@ -90,13 +99,20 @@ begin
 *   QNAME.  Tag is name of another data type symbol.
 }
 1: begin
+  syn_trav_save (syn_p^, pos);         {save position at start of dtype symbol ref}
   mcomp_syt_qname (                    {process QNAME syntax}
     [code_symtype_dtype_k],            {set of allowable symbol types}
     sym_p);                            {returned pnt to symbol, NIL = not found}
+  if sym_p = nil then begin            {no such data type ?}
+    syn_trav_goto (syn_p^, pos);       {go back to start of data type sym reference}
+    syn_trav_tag_string (syn_p^, name); {get the data type sym reference string}
+    sys_msg_parm_vstr (msg_parm[1], name);
+    syn_msg_pos_bomb (syn_p^, '', 'type_sym_nfnd', msg_parm, 1);
+    end;
 
-
-
-
+  code_dtype_copy (                    {make COPY data type of SYM data type}
+    sym_p^.dtype_dtype_p^,             {data type to copy}
+    dtype);                            {filled in as COPY data type}
   end;
 {
 *   INTEGER.

@@ -98,3 +98,6 @@ msg type_int_bad
 msg type_name_bad
   lan english -def
     Not a valid data type name.
+msg type_sym_nfnd
+  lan english -def
+    No such data type as "%p1s".
