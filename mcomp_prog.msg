@@ -67,15 +67,16 @@ msg qname_ent_bad
     Invalid qualified symbol name component.
 msg qname_ent_nfnd
   lan english -def
-    Component "%p1s" of type %p2s in qualified symbol type name not found.
+    Component "%p1s" in qualified symbol type name does not exist or is
+    not a symbol type that has a scope.
 msg qname_ent_nfnd_ty
   lan english -def
-    Component "%p1s" in qualified symbol type name not found.
+    Component "%p1s" of type %p2s in qualified symbol type name not found.
 msg qname_ent_nscope
   lan english -def
     Component "%p1s" in qualified symbol type name does not have a
-    subordinate scope, but is not last component.  All components of the
-    last must identify scopes.
+    subordinate scope, but is not last component.  All components of a
+    qualified symbol name except the last must identify scopes.
 msg statement_bad
   lan english -def
     Invalid statement.
