@@ -57,6 +57,7 @@
   .optional ("%" letts[3])
 
 .define qname .as                      /* possibly qualified symbol name
+  .not "-"
   .optional ":"[1]
   qnent[2]
   .occurs[0 to inf] (":" qnent[2])
