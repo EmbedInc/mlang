@@ -10,7 +10,7 @@
 
 <h1 class=page>The M Computer Language
   <br>Basic Syntax</h1>
-<p class=page>Last updated 7 January 2012</p>
+<p class=page>Last updated 6 Sep 2025</p>
 
 <p>This chapter introduces the basic syntax rules of M.
 
@@ -100,14 +100,13 @@
   <p>There can be at most one comment per line.&nbsp;  Once a comment is
   started, the entire remainder of the line is part of that comment.&nbsp;
 
-  <p>The apostrophy character ('), character code 39, starts a end of line
-  comment unless it is in a quoted string.&nbsp;  The only two uses for
-  the apostrophy character are as a character in a literal string, and to
-  indicate start of comment.&nbsp;  For the purpose of semantically
-  processing the source stream, the comment start character and all
-  characters following it up to the end of line are discarded.&nbsp;
-  Then, any blank characters at the end of the line are also
-  discarded.&nbsp;
+  <p>The apostrophy character ('), code 39, starts a comment unless it is
+  in a quoted string.&nbsp;  The only two uses for the apostrophy
+  character are as a character in a literal string, and to indicate start
+  of comment.&nbsp;  For the purpose of semantically processing the source
+  stream, the comment start character and all characters following it up
+  to the end of line are discarded.&nbsp; Then, any blank characters at
+  the end of the line are also discarded.&nbsp;
 
   <p>Empty lines are also ignored semantically.&nbsp;  Note that a empty
   line results from any line that is either all blank or where the only
@@ -189,7 +188,7 @@
 
   '   Block 2.  This comment block applies to the whole section of following
   '   code, which is the FOOBLOCK - MORESTUFF statements since these are all at
-  '   the same or higher indentation level as this comment.
+  '   the same or deeper indentation level as this comment.
   '
   <b>fooblock</b> 27                           'applies to start of fooblock statement
     '
@@ -254,9 +253,9 @@
     <p>Lines that continue the previous statement, also referred to as
     "continuation lines", are indented two levels from the start of the
     statement.&nbsp; Since it is not possible to immediately jump two
-    levels deeper than the previous statement, two indentation levels are
-    used to indicate a continuation of the previous statement as apposed
-    to the start of a subordinate statement.&nbsp;
+    levels deeper than the previous statement, two indentation levels
+    unambiguously indicate a continuation of the previous statement as
+    apposed to the start of a subordinate statement.&nbsp;
 
     <p>Some statements start a block of code.&nbsp; Statements inside such
     a     block are said to be subordinate to the statement that started
@@ -285,12 +284,12 @@
     <b>name</b> "chicken" <b>street</b> "Maple Ave"  'continued, still part of <b>topstatement</b>
 <b>anotherstatement</b>                       'second top level statement
 <b>startblock</b>                             'starts a code block structure
-    27 32 "stuff"                      'parameters to <b>startblock</b> statement
+    27 32 "stuff"                      'continuation of <b>startblock</b>
   <b>dosomestuff</b>                          'first statement in block
     <b>values</b>                             'substatement to <b>dosomestuff</b>
-        27 39 "hike"                   'parameters to <b>values</b>
-  <b>domorestuff</b>                          'second statement in code block
-      13 17 19                         'parameters to <b>domorestuff</b>
+        27 39 "hike"                   'continuation of <b>values</b>
+  <b>domorestuff</b>                          'second statement in <b>startblock</b> block
+      13 17 19                         'continuation of <b>domorestuff</b>
 <b>dosomestuff values</b> 4 6 8               'at top level, no longer in code block
     </pre>
 
@@ -326,15 +325,14 @@
   symbols.&nbsp;
 
   <p>A Symbol name can be <i>unqualified</i>, which means it is written as
-  a bare name and the namespace hierarchy it is defined in is not
-  explicitly stated.&nbsp;  In that case a set of default rules are
-  applied to find the specific symbol being referenced.&nbsp;  These rules
-  are context-sensitive, and not defined here.&nbsp;  In general however,
-  the matching symbol is used from the lowest namespace in the current
-  hierarcy.&nbsp;  For example, if a global variable <tt>count</tt> is
-  defined and a variable <tt>count</tt> is also defined within a
-  subroutine, then unqualified references <tt>count</tt> in that
-  subroutine will refer to the local variable, not the global.&nbsp;
+  a bare name and the namespace it is defined in is not explicitly
+  stated.&nbsp;  In that case the default rule is applied to find the
+  specific symbol being referenced.&nbsp;  The matching symbol is used
+  from the lowest namespace in the current hierarcy.&nbsp;  For example,
+  if a global variable <tt>count</tt> is defined and a variable
+  <tt>count</tt> is also defined within a subroutine, then unqualified
+  references <tt>count</tt> in that subroutine will refer to the local
+  variable, not the global.&nbsp;
 
   <p>Sometimes it is necessary or desirable to explicitly specify the
   namespace of a symbol.&nbsp;  Such a symbol reference is referred to as
@@ -348,13 +346,13 @@
 
   <p>Note that the example reference <tt>mysub:count</tt> in the previous
   paragraph is still relative.&nbsp;  The reference to <tt>mysub</tt> will
-  be resolved using default rules in the current context.&nbsp;  A
+  be resolved using the default rule in the current namespace.&nbsp;  A
   <i>fully qualified</i> symbol reference starts at the root namespace and
-  no context-sensitive rules are or can be applied to its
-  interpretation.&nbsp; A fully qualified (also referred to as
-  <i>absolute</i>) symbol reference starts with the colon (:)
-  character.&nbsp;  The leading colon refers to the root namespace, with
-  the first name being defined immediately within the root.&nbsp;
+  the default rule can not and is not applied to its interpretation.&nbsp;
+  A fully qualified (also referred to as <i>absolute</i>) symbol reference
+  starts with the colon (:) character.&nbsp;  The leading colon refers to
+  the root namespace, with the first name being defined immediately within
+  the root.&nbsp;
 
   <p>A namespace defined immediately within the root namespace is referred
   to as a <i>top level</i> namespace.&nbsp;  The top level namespace

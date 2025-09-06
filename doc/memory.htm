@@ -10,7 +10,7 @@
 
 <h1 class=page>The M Computer Language
   <br>Memory Model</h1>
-<p class=page>Last updated 25 Aug 2022</p>
+<p class=page>Last updated 6 Sep 2025</p>
 
 
 <p>The M model of the underlying machine's memory architecture consists of
@@ -155,9 +155,11 @@ particular target machine.&nbsp;
 
       <p><tt><b>inherit</b></tt></p><indent>
 
-        <p>Set all accesses to that of the parent.  For entiry types that
-        have no parent (like memories and address spaces), <i>inhert</i>
-        sets all possible access types.
+        <p>All access types of the parent are inherited.  For entities
+        that have no parent, like a <tt><b>memory</b></tt>, this
+        enables all possible access types. Put another way, for purposes
+        of access type inheritance, top level entities are viewed as
+        having a parent will all possible access types enabled.
 
         </p></indent>
 
@@ -227,7 +229,10 @@ particular target machine.&nbsp;
 
     </p></indent>
 
-  <p><tt><b>access</b> [-]<i>accesstype</i></tt></p><indent>
+  <p><tt><b>access</b> [-]<i>accesstype</i> ... [-]<i>accesstype</i></tt></p><indent>
+
+    <p>See <tt><b>access</b></tt> parameter to <tt><b>memory</b></tt>
+    statement.
 
     </p></indent>
 
@@ -246,7 +251,12 @@ particular target machine.&nbsp;
 
   <p><tt><b>datbits</b> <i>nbits</i></tt>
 
-  <p><tt><b>access</b> <b>[-]</b><i>accesstype</i></tt>
+  <p><tt><b>access</b> [-]<i>accesstype</i> ... [-]<i>accesstype</i></tt></p><indent>
+
+    <p>See <tt><b>access</b></tt> parameter to <tt><b>memory</b></tt>
+    statement.
+
+    </p></indent>
 
   </p></indent>
 
@@ -269,7 +279,12 @@ particular target machine.&nbsp;
 
   <p><tt><b>endadr</b> <i>address</i></tt></p>
 
-  <p><tt><b>access</b> [-]<i>accesstype</i></tt></p>
+  <p><tt><b>access</b> [-]<i>accesstype</i> ... [-]<i>accesstype</i></tt></p><indent>
+
+    <p>See <tt><b>access</b></tt> parameter to <tt><b>memory</b></tt>
+    statement.
+
+    </p></indent>
 
   <p><tt><b>mapsto</b> <i>memory region</i></tt></p>
 
