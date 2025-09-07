@@ -52,9 +52,9 @@
     )
 
 .define qnent .as                      /* one qualified symbol name entry
-  ("-" integer[1]) .or
-  name[2]
-  .optional ("%" letts[3])
+  ("-" integer[1]) .or                 /* number of levels top pop up
+  name[2]                              /* symbol name at current level
+  .optional ("%" letts[3])             /* specific symbol type
 
 .define qname .as                      /* possibly qualified symbol name
   .not "-"

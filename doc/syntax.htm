@@ -10,7 +10,7 @@
 
 <h1 class=page>The M Computer Language
   <br>Basic Syntax</h1>
-<p class=page>Last updated 6 Sep 2025</p>
+<p class=page>Last updated 7 Sep 2025</p>
 
 <p>This chapter introduces the basic syntax rules of M.
 
@@ -320,9 +320,10 @@
 
     </ul>
 
-  <p>Each symbol must be unique within its <i>namespace</i>.&nbsp;
-  Namespaces are tree structured, and are themselves identified by
-  symbols.&nbsp;
+  <p>Each symbol must be unique for its catagory within its
+  <i>namespace</i>.&nbsp; Namespaces are tree structured, and are
+  themselves identified by symbols.&nbsp;  Symbol type catagories are
+  described in more detail below.
 
   <p>A Symbol name can be <i>unqualified</i>, which means it is written as
   a bare name and the namespace it is defined in is not explicitly
@@ -334,37 +335,157 @@
   references <tt>count</tt> in that subroutine will refer to the local
   variable, not the global.&nbsp;
 
-  <p>Sometimes it is necessary or desirable to explicitly specify the
-  namespace of a symbol.&nbsp;  Such a symbol reference is referred to as
-  <i>qualified</i> and contains one or more namespace names in addition to
-  the end symbol name within the last namespace.&nbsp;  Inidividual
-  namespace or symbol names within a qualified symbol reference are
-  separated from each other with the colon (:) character.&nbsp;  The names
-  are listed in global to local order.&nbsp;  For example, the qualified
-  reference <tt>mysub:count</tt> refers to the symbol <tt>count</tt>
-  within the <tt>mysub</tt> namespace.&nbsp;
+  <h3 id="qualsym">Qualified symbol references</h3><indent>
 
-  <p>Note that the example reference <tt>mysub:count</tt> in the previous
-  paragraph is still relative.&nbsp;  The reference to <tt>mysub</tt> will
-  be resolved using the default rule in the current namespace.&nbsp;  A
-  <i>fully qualified</i> symbol reference starts at the root namespace and
-  the default rule can not and is not applied to its interpretation.&nbsp;
-  A fully qualified (also referred to as <i>absolute</i>) symbol reference
-  starts with the colon (:) character.&nbsp;  The leading colon refers to
-  the root namespace, with the first name being defined immediately within
-  the root.&nbsp;
+    <p>The namespace and symbol type can be explicitly specified when a
+    symbol is referenced.  The full symbol reference syntax is:</p><indent>
 
-  <p>A namespace defined immediately within the root namespace is referred
-  to as a <i>top level</i> namespace.&nbsp;  The top level namespace
-  <tt>M</tt> is reserved for symbols defined by the M language.&nbsp;
-  This namespace and any symbols within it can not be defined in M
-  code.&nbsp; There are other reserved namespace names and other rules
-  that refer to namespaces.&nbsp;  These are described in more detail
-  elsewhere in this document.&nbsp;
+      <p>[<tt><b>:</b></tt>]<i>name</i>[...<tt><b>:</b></tt><i>name</i>][<tt><b>%</b></tt><i>sytype</i>]
+      </p></indent>
 
-  <p>In the syntax definitions in the document, whenever a symbol name is
-  referred to it may be unqualified or partially or fully qualified unless
-  explicitly stated otherwise.&nbsp;
+    <p>A qualified symbol name is a string of names separated by colons
+    (:).  These are the namespace hierarchy in global to local order.  The
+    optional leading colon before the sequence of names specifies the root
+    scope.  Such symbol name references are termed "fully qualified" or
+    "absolute".  The optional trailing <i>stype</i> specifies the symbol
+    type.
+
+    <h4><i>name</i></h4><indent>
+
+      <p><i>Name</i> can be either the bare name of a symbol or the
+      special syntax of a minus sign (-) followed by an integer value.
+
+      <p>Each name must be the name of a symbol within its parent scope.
+      All but the last name in the list must therefore be a type that can
+      contain subordinate symbols.  Explicit scopes and subroutines, for
+      example, can have subordinate symbols, but simple variables do not.
+
+      <p>A <i>name</i> of "<tt><b>-</b></tt><i>integer</i>" specifies the
+      number of levels to pop up in the namespace hierarchy.  For example,
+      "-1" means the parent of the current namespace, and "-2" its parent,
+      etc.
+
+      </p></indent>
+
+    <h4><i>stype</i></h4><indent>
+
+      <p><i>Stype</i> is a keyword specifying the symbol type of the last
+      <i>name</i>.  Names within a symbol namespace are only required to
+      be unique within specific symbol type catagories.  These catagories
+      are:</p><indent>
+
+        <p>Scope - Any symbol that is also a namespace for subordinate
+        symbols, such as explicit namespaces and subroutines.
+
+        <p>Variables and constants.
+
+        <p>Data types.
+
+        <p>Labels.
+
+        <p>All other symbols, including memories, address spaces and their
+        regions, and common blocks.
+
+        </p></indent>
+
+      <p>The <i>stype</i> keyword is case-insensitive.  The valid
+      <i>stype</i> keywords are:
+
+      <h5><tt>SCOPE</tt></h5><indent>
+
+        <p>Explicit namespace with no other function.
+
+        </p></indent>
+
+      <h5><tt>MEMORY</tt></h5><indent>
+
+        <p>A memory defined with the <tt><b>memory</b></tt> statement.
+
+        </p></indent>
+
+      <h5><tt>MEMREG</tt></h5><indent>
+
+        <p>A memory region defined with the <tt><b>memregion</b></tt> statement.
+
+        </p></indent>
+
+      <h5><tt>ADRSP</tt></h5><indent>
+
+        <p>An address space defined with the <tt><b>address</b></tt> statement.
+
+        </p></indent>
+
+      <h5><tt>ADREG</tt></h5><indent>
+
+        <p>An address region defined with the <tt><b>addregion</b></tt> statement.
+
+        </p></indent>
+
+      <h5><tt>CONST</tt></h5><indent>
+
+        <p>Constant.
+
+        </p></indent>
+
+      <h5><tt>VAR</tt></h5><indent>
+
+        <p>Variable.
+
+        </p></indent>
+
+      <h5><tt>PROC</tt></h5><indent>
+
+        <p>Procedure, like a subroutine or function.
+
+        </p></indent>
+
+      <h5><tt>PROG</tt></h5><indent>
+
+        <p>Top level program.
+
+        </p></indent>
+
+      <h5><tt>COMBLK</tt></h5><indent>
+
+        <p>Common block.
+
+        </p></indent>
+
+      <h5><tt>MODULE</tt></h5><indent>
+
+        <p>Name of a source code module.
+
+        </p></indent>
+
+      <h5><tt>LABEL</tt></h5><indent>
+
+        <p>Label for specific point in the source code.
+
+        </p></indent>
+
+    <p>A symbol type is sometimes inferred or required from context.  In
+    such cases there is no need to specify the symbol type, although it is
+    allowed.  For example, the target of an assignment statement can only
+    be a variable.
+
+    <p>When no symbol type is specified, then the first symbol that is
+    valid from the context is used within the order:</p><indent>
+
+      <p>Variables and constants
+
+      <p>Symbols with subordinate symbols, like explicit scopes,
+      procedures, the top level program, and source code modules.
+
+      <p>Data types.
+
+      <p>Labels.
+
+      <p>All other symbols, like memories and address spaces and their
+      regions, common blocks, etc.
+
+      </p></indent>
+
+    </p></indent><!-- end of STYPE -->
 
   </p></indent>
 

@@ -47,7 +47,7 @@ begin
 2:    begin                            {symbol name}
         syn_trav_tag_string (syn_p^, syname); {get the symbol name}
         end;
-3:    begin
+3:    begin                            {symbol type}
         syn_trav_tag_string (syn_p^, tyname); {get the symbol type name}
         end;
 syn_tag_end_k: goto done_tags;         {normal syntax end}
