@@ -146,4 +146,4 @@
 /*   Substatements within specific blocks.
 /*
 .define type_sub .as
-  name[1] space dtype[1]
+  name[1] space dtype[1] pad .eol

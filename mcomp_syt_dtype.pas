@@ -17,27 +17,44 @@ procedure mcomp_syt_type_sub;
 var
   tag: sys_int_machine_t;              {tagged syntax ID}
   name: mcomp_name_t;                  {name of data type being defined}
-  dtype: code_dtype_t;                 {data type name being defined as}
+  dtype: code_dtype_t;                 {data type name is being defined as}
   sym_p: code_symbol_p_t;              {to new data type symbol}
 
 begin
+  name.max := size_char(name.str);     {init local var string}
+
   if not syn_trav_next_down (syn_p^) then begin {down into TYPE_SUB syntax}
     syn_msg_pos_bomb (syn_p^, '', 'type_bad', nil, 0);
     end;
-
+{
+*   Create the new data type symbol.
+}
   tag := syn_trav_next_tag (syn_p^);   {get tag for name of data type being defined}
   if tag <> 1 then begin
     syn_msg_tag_bomb (syn_p^, '', 'type_name_bad', nil, 0);
     end;
   syn_trav_tag_string (syn_p^, name);  {get name of data type being defined}
-
+  code_dtype_sym_new (code_p^, name, sym_p); {create new data type symbol}
+  syn_trav_tag_start (syn_p^, sym_p^.pos); {save source code position}
+  code_comm_find (                     {tag the new structure with comment, if any}
+    code_p^,                           {CODE library use state}
+    mcomp_currline,                    {current global sequential source line number}
+    currlevel,                         {current nesting level}
+    sym_p^.comm_p);                    {returned pointer to comments}
+{
+*   Process the data type syntax.
+}
   tag := syn_trav_next_tag (syn_p^);   {get tag for data type definition or reference}
   if tag <> 1 then begin
     syn_msg_tag_bomb (syn_p^, '', 'type_def_bad', nil, 0);
     end;
   mcomp_syt_dtype (dtype);             {process DTYPE syntax, fill in data type}
+  code_comm_find (                     {tag the new structure with comment, if any}
+    code_p^,                           {CODE library use state}
+    mcomp_currline,                    {current global sequential source line number}
+    currlevel,                         {current nesting level}
+    dtype.comm_p);                     {returned pointer to comments}
 
-  code_dtype_sym_new (code_p^, name, sym_p); {create new data type symbol}
   code_dtype_sym_set (code_p^, sym_p^, dtype); {assign data type to symbol}
 
   if not syn_trav_up (syn_p^) then begin {back up to parent syntax level}
