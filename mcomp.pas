@@ -158,9 +158,13 @@ done_opts:                             {done with all the command line options}
     code_memsym_show_all (code_p^, 0);
     end;
 
-  if show_sym then begin
-    writeln;                           {show tree of symbols ?}
-    code_scope_show (code_p^, code_p^.scope_root, 0);
+  if show_sym then begin               {show tree of symbols ?}
+    writeln;
+    code_scope_show (
+      code_p^,                         {CODE library use state}
+      code_p^.scope_root,              {top symbol of tree to show}
+      0,                               {nesting level of scope to show}
+      [code_symshow_scopes_k]);        {show subordinate scopes, tree structured}
     end;
 
   if not docomp then goto abort1;      {don't do compilation step ?}
