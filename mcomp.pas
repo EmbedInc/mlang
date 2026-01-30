@@ -17,6 +17,7 @@ var
   show_sym: boolean;                   {show symbols resulting from parsing}
   show_mem: boolean;                   {show memory configuration}
   docomp: boolean;                     {do compilation}
+  symshow: code_symshow_t;             {control state for showing symbols tree}
 
   opt:                                 {upcased command line option}
     %include '(cog)lib/string_treename.ins.pas';
@@ -160,11 +161,13 @@ done_opts:                             {done with all the command line options}
 
   if show_sym then begin               {show tree of symbols ?}
     writeln;
+    code_symshow_init (symshow);       {init symbol-showing control state}
+    symshow.maxlev := 3;               {max tree levels to show}
     code_scope_show (
       code_p^,                         {CODE library use state}
       code_p^.scope_root,              {top symbol of tree to show}
       0,                               {nesting level of scope to show}
-      [code_symshow_scopes_k]);        {show subordinate scopes, tree structured}
+      symshow);                        {control state for showing symbols tree}
     end;
 
   if not docomp then goto abort1;      {don't do compilation step ?}
