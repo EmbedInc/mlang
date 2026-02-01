@@ -1,5 +1,5 @@
                            Embed program MCOMP
-                             25 January 2025
+                             31 January 2026
 
 mcomp [options]
 
@@ -38,3 +38,11 @@ language.  The command line parameters are:
   -MEM
 
     Show the memory configuration.  No compilation is performed.
+
+  -CMD
+
+    Run an interactive command line processor after the input file has
+    been parsed.  This allows the user to examine the data structures
+    created from the input file data.  The user has the option to continue
+    processing or to end the program when exiting the command processor.
+    Enter "?" for a brief list of commands.

@@ -17,7 +17,9 @@ var
   show_sym: boolean;                   {show symbols resulting from parsing}
   show_mem: boolean;                   {show memory configuration}
   docomp: boolean;                     {do compilation}
+  cmdparse: boolean;                   {run command processor after parsing}
   symshow: code_symshow_t;             {control state for showing symbols tree}
+  cmdcont: code_cmd_cont_t;            {how to continue from command processing}
 
   opt:                                 {upcased command line option}
     %include '(cog)lib/string_treename.ins.pas';
@@ -41,6 +43,7 @@ begin
   showver := false;                    {init to not show program version}
   show_sym := false;                   {init to not show symbols from parsing}
   docomp := true;                      {init to do compilation}
+  cmdparse := false;                   {init to not run debug cmd after parsing}
 
   mcomp_global_init (util_top_mem_context); {init global program state}
 {
@@ -61,7 +64,7 @@ next_opt:
     end;
   string_upcase (opt);                 {make upper case for matching list}
   string_tkpick80 (opt,                {pick command line option name from list}
-    '-IN -PRE -V -TREE -SYM -MEM',
+    '-IN -PRE -V -TREE -SYM -MEM -CMD',
     pick);                             {number of keyword picked from list}
   case pick of                         {do routine for specific option}
 {
@@ -110,6 +113,12 @@ next_opt:
 6: begin
   show_mem := true;                    {show memory config defined in input file}
   docomp := false;
+  end;
+{
+*   -CMD
+}
+7: begin
+  cmdparse := true;                    {run command processor after parsing}
   end;
 {
 *   Unrecognized command line option.
@@ -168,6 +177,18 @@ done_opts:                             {done with all the command line options}
       code_p^.scope_root,              {top symbol of tree to show}
       0,                               {nesting level of scope to show}
       symshow);                        {control state for showing symbols tree}
+    end;
+
+  if cmdparse then begin               {let user examine state from parsing ?}
+    code_cmd (code_p^, cmdcont, stat); {run the command processor}
+    sys_error_abort (stat, '', '', nil, 0);
+    case cmdcont.opt of                {how to continue ?}
+code_cmd_cont_go_k: ;                  {continue normally}
+code_cmd_cont_exit_k: goto abort1;     {exit the program}
+code_cmd_cont_err_k: goto abort1;      {error, should have aborted above}
+otherwise
+      goto abort1;                     {unrecognized response, abort the program}
+      end;
     end;
 
   if not docomp then goto abort1;      {don't do compilation step ?}
