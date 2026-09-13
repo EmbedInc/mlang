@@ -17,7 +17,7 @@ procedure mcomp_syt_type_sub;
 var
   tag: sys_int_machine_t;              {tagged syntax ID}
   name: mcomp_name_t;                  {name of data type being defined}
-  dtype: code_dtype_t;                 {data type name is being defined as}
+  dtype_p: code_dtype_p_t;             {to dtype specified by TYPE substatement}
   sym_p: code_symbol_p_t;              {to new data type symbol}
 
 begin
@@ -48,14 +48,14 @@ begin
   if tag <> 1 then begin
     syn_msg_tag_bomb (syn_p^, '', 'type_def_bad', nil, 0);
     end;
-  mcomp_syt_dtype (dtype);             {process DTYPE syntax, fill in data type}
+
+  mcomp_syt_dtype (dtype_p);           {get pointer to found or created data type}
+  code_dtype_sym_set (code_p^, sym_p^, dtype_p^); {assign data type to symbol}
   code_comm_find (                     {tag the new structure with comment, if any}
     code_p^,                           {CODE library use state}
     mcomp_currline,                    {current global sequential source line number}
     currlevel,                         {current nesting level}
-    dtype.comm_p);                     {returned pointer to comments}
-
-  code_dtype_sym_set (code_p^, sym_p^, dtype); {assign data type to symbol}
+    sym_p^.dtype_dtype_p^.comm_p);     {returned pointer to comments}
 
   if not syn_trav_up (syn_p^) then begin {back up to parent syntax level}
     syn_msg_pos_bomb (syn_p^, '', 'type_bad', nil, 0);
@@ -79,12 +79,16 @@ begin
 {
 ********************************************************************************
 *
-*   Subroutine MCOMP_SYT_DTYPE (DTYPE)
+*   Subroutine MCOMP_SYT_DTYPE (DTYPE_P)
 *
-*   Process the DTYPE syntax and fill in DTYPE accordingly.
+*   Process the DTYPE syntax and return DTYPE_P pointing to the data type the
+*   DTYPE syntax specifies.  DTYPE_P may be returned a pointer to an existing
+*   data type that matches the specification, or a newly created data type
+*   descriptor.  In the latter case, the new data type descriptor will not have
+*   a symbol associated with it.
 }
 procedure mcomp_syt_dtype (            {process DTYPE syntax}
-  out     dtype: code_dtype_t);        {data type to fill in}
+  out     dtype_p: code_dtype_p_t);    {to found or created data type, never NIL}
   val_param;
 
 const
@@ -94,21 +98,21 @@ var
   tag: sys_int_machine_t;              {tagged syntax ID}
   sym_p: code_symbol_p_t;              {scratch symbol pointer}
   pos: syn_treepos_t;                  {scratch syntax tree traversing position}
+  dt: code_dtype_t;                    {scratch internal data type descriptor}
   name: string_var80_t;                {scratch string}
   msg_parm:                            {references arguments passed to a message}
     array[1..max_msg_args] of sys_parm_msg_t;
 
 label
-  have_dtype;
+  int_dsyn;
 
 begin
   name.max := size_char(name.str);     {init local var string}
+  dtype_p := nil;                      {init to return pointer not set yet}
 
   if not syn_trav_next_down (syn_p^) then begin {down into DTYPE syntax}
     syn_msg_pos_bomb (syn_p^, '', 'type_def_bad', nil, 0);
     end;
-
-  code_dtype_init (dtype);             {init returned data type to benign or default}
 
   tag := syn_trav_next_tag (syn_p^);   {get tag for top level data type}
   case tag of                          {which top level data type is it ?}
@@ -127,39 +131,47 @@ begin
     syn_msg_pos_bomb (syn_p^, '', 'type_sym_nfnd', msg_parm, 1);
     end;
 
-  code_dtype_copy (                    {make COPY data type of SYM data type}
-    sym_p^.dtype_dtype_p^,             {data type to copy}
-    dtype);                            {filled in as COPY data type}
+  dtype_p := sym_p^.dtype_dtype_p;     {return symbol's data type}
+  if dtype_p = nil then begin          {symbol doesn't have data type set ?}
+    syn_trav_goto (syn_p^, pos);       {go back to start of data type sym reference}
+    syn_trav_tag_string (syn_p^, name); {get the data type sym reference string}
+    sys_msg_parm_vstr (msg_parm[1], name);
+    syn_msg_pos_bomb (syn_p^, '', 'type_sym_ndef', msg_parm, 1);
+    end;
   end;
 {
 *   INTEGER.
 }
 2: begin
-  dtype.typ := code_typid_int_k;       {set to INT data type}
-  dtype.bits_min := code_p^.default.int_bits; {init number of bits to default}
-  dtype.int_sign := false;             {init to unsigned}
-  dtype.int_exactbits := false;        {init to not exactly BITS_MIN bits}
+  code_dtype_init (dt);                {init temp data type descriptor}
+  dt.typ := code_typid_int_k;          {set to INT data type}
+  dt.bits_min := code_p^.default.int_bits; {init number of bits to default}
+  dt.int_sign := false;                {init to unsigned}
+  dt.int_exactbits := false;           {init to not exactly BITS_MIN bits}
 
   while true do begin                  {back here each new INTEGER tag}
     tag := syn_trav_next_tag (syn_p^); {get INTEGER parameter tag}
     case tag of                        {which INTEGER parameter ?}
 1:    begin                            {SIGNED}
-        dtype.int_sign := true;
+        dt.int_sign := true;
         end;
 2:    begin                            {BITS n}
-        dtype.bits_min := mcomp_syt_integer;
+        dt.bits_min := mcomp_syt_integer;
         end;
 3:    begin                            {BITSEXACT n}
-        dtype.bits_min := mcomp_syt_integer;
-        dtype.int_exactbits := true;
+        dt.bits_min := mcomp_syt_integer;
+        dt.int_exactbits := true;
         end;
 syn_tag_end_k: begin
-      goto have_dtype;
+      goto int_dsyn;
       end;
 otherwise
       syn_msg_pos_bomb (syn_p^, '', 'type_int_bad', nil, 0);
       end;
     end;                               {back to get next INTEGER parameter}
+
+int_dsyn:                              {done processing INTEGER syntax}
+  code_dtype_int_find (code_p^, dt, dtype_p); {return pnt to base int type}
   end;
 {
 *   Unexpected or invalid top level DTYPE tag.
@@ -168,7 +180,10 @@ otherwise
     syn_msg_tag_bomb (syn_p^, '', 'type_def_bad', nil, 0);
     end;
 
-have_dtype:                            {syntax was valid, DTYPE all filled in}
+  if dtype_p = nil then begin          {trying to return NIL pointer ?}
+    syn_msg_pos_bomb (syn_p^, '', 'syt_dtype_nil', nil, 0);
+    end;
+
   if not syn_trav_up (syn_p^) then begin {back up to parent syntax level}
     syn_msg_pos_bomb (syn_p^, '', 'type_def_bad', nil, 0);
     end;

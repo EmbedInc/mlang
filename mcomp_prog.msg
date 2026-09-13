@@ -87,6 +87,9 @@ msg statement_err
 msg statement_subordinate
   lan english -def
     A subordinate statement is not allowed here.
+msg syt_dtype_nil
+  lan english -def
+    INTERNAL ERROR: Returned data type pointer NIL in MCOMP_SYT_DTYPE.
 msg type_bad
   lan english -def
     Invalid TYPE statement.
@@ -99,6 +102,9 @@ msg type_int_bad
 msg type_name_bad
   lan english -def
     Not a valid data type name.
+msg type_sym_ndef
+  lan english -def
+    The data type of "%p1s" has not been defined yet.
 msg type_sym_nfnd
   lan english -def
     No such data type as "%p1s".

@@ -76,10 +76,10 @@ procedure mcomp_err_atline (           {show error, source line, and bomb progra
   in      n_parms: sys_int_machine_t); {number of parameters in PARMS}
   options (val_param, extern, noreturn);
 
-procedure mcomp_global_end;            {end use of global state, release resources}
+procedure mcomp_global_end;            {end MCOMP prog global state, release resources}
   val_param; extern;
 
-procedure mcomp_global_init (          {init global MCOMP program state}
+procedure mcomp_global_init (          {init MCOMP prog global state}
   in out  mem: util_mem_context_t);    {parent mem context, will create subordinate}
   val_param; extern;
 
@@ -145,7 +145,7 @@ procedure mcomp_syt_accesstype (       {interpret ACCESSTYPE syntax}
   val_param; extern;
 
 procedure mcomp_syt_dtype (            {process DTYPE syntax}
-  out     dtype: code_dtype_t);        {data type to fill in}
+  out     dtype_p: code_dtype_p_t);    {to found or created data type, never NIL}
   val_param; extern;
 
 function mcomp_syt_integer             {interpret INTEGER syntax}

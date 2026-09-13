@@ -19,13 +19,19 @@
 .symbol adrspace_
 .symbol adrregion_
 .symbol set_
+.symbol var_
 /*
 /*   Syntax constructions that are sub-statements.  These are intended to be
 /*   called separately for each sub-statement by the code interpreting the
 /*   syntax.  They therefore need to have externally known names
 /*
 .symbol type_sub[mcomp_syn_type]       /* substatement in TYPE block
+.symbol var_sub[mcomp_syn_var]         /* substatement in VAR block
 
+/*******************************************************************************
+/*
+/*   Syntax definitions.
+/*
 .define letts .as                      /* sequence of raw letters
   .charcase [upper]
   .occurs[1 to inf] .range ["A" thru "Z"]
@@ -94,6 +100,7 @@
     ("adrregion" space adrregion_[5]) .or
     ("set" space set_[6]) .or
     "type"[7] .or
+    ("var" var_[8]) .or
     set_[6]
     )
   pad .eol
@@ -142,8 +149,24 @@
 
 .define set_ .as
   qname[1] pad "<<" pad expression[1]
+
+.define var_ .as
+  .occurs[0 to inf] (
+    space
+    ("name" space name[1]) .or
+    ("in" space name[2])
+    )
 /*
 /*   Substatements within specific blocks.
 /*
 .define type_sub .as
   name[1] space dtype[1] pad .eol
+
+.define var_sub .as
+  name[1]
+  .occurs[0 to inf] (
+    space
+    ("type" space dtype[1]) .or
+    ("in" space qname[2])
+    )
+  pad .eol
