@@ -188,6 +188,9 @@ begin
 7:  begin                              {TYPE statement block}
       mcomp_syt_type_;
       end;
+8:  begin                              {VAR statement block}
+      mcomp_syt_var_;
+      end;
 otherwise                              {unexpected tag}
     syn_msg_tag_bomb (syn_p^, 'mcomp_prog', 'statement_bad', nil, 0);
     end;

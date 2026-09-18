@@ -42,12 +42,8 @@ begin
   syn_trav_tag_string (syn_p^, name);  {get the new memory name}
   code_mem_new (code_p^, name, mem_p, stat); {create the new memory descriptor}
   syn_error_bomb (syn_p^, stat, 'mcomp_prog', 'mem_err', nil, 0);
-  syn_trav_tag_start (syn_p^, mem_p^.sym_p^.pos); {save source code position}
-  code_comm_find (                     {tag the new structure with comment, if any}
-    code_p^,                           {CODE library use state}
-    mcomp_currline,                    {current global sequential source line number}
-    currlevel,                         {current nesting level}
-    mem_p^.sym_p^.comm_p);             {returned pointer to comments}
+  mcomp_pos_set (mem_p^.sym_p^.pos);   {save source code position}
+  mcomp_comm_set (mem_p^.sym_p^.comm_p); {tag new symbol with curr comments}
 {
 *   Process the command options.
 }
@@ -139,12 +135,8 @@ begin
     stat);
   syn_error_bomb (syn_p^, stat, 'mcomp_prog', 'memreg_err', nil, 0);
 
-  syn_trav_tag_start (syn_p^, memreg_p^.sym_p^.pos); {save source code position}
-  code_comm_find (                     {tag the new structure with comment, if any}
-    code_p^,                           {CODE library use state}
-    mcomp_currline,                    {current global sequential source line number}
-    currlevel,                         {current nesting level}
-    memreg_p^.sym_p^.comm_p);          {returned pointer to comments}
+  mcomp_pos_set (memreg_p^.sym_p^.pos); {save source code position}
+  mcomp_comm_set (memreg_p^.sym_p^.comm_p); {tag new symbol with curr comments}
 {
 *   Process the command options.
 }
@@ -243,12 +235,8 @@ begin
   syn_trav_tag_string (syn_p^, name);  {get the new address space name}
   code_adrsp_new (code_p^, name, adr_p, stat); {create the new address space descriptor}
   syn_error_bomb (syn_p^, stat, 'mcomp_prog', 'adr_err', nil, 0);
-  syn_trav_tag_start (syn_p^, adr_p^.sym_p^.pos); {save source code position}
-  code_comm_find (                     {tag the new structure with comment, if any}
-    code_p^,                           {CODE library use state}
-    mcomp_currline,                    {current global sequential source line number}
-    currlevel,                         {current nesting level}
-    adr_p^.sym_p^.comm_p);             {returned pointer to comments}
+  mcomp_pos_set (adr_p^.sym_p^.pos);   {save source code position}
+  mcomp_comm_set (adr_p^.sym_p^.comm_p); {tag new symbol with curr comments}
 {
 *   Process the command options.
 }
@@ -341,12 +329,8 @@ begin
     stat);
   syn_error_bomb (syn_p^, stat, 'mcomp_prog', 'adrreg_err', nil, 0);
 
-  syn_trav_tag_start (syn_p^, adrreg_p^.sym_p^.pos); {save source code position}
-  code_comm_find (                     {tag the new structure with comment, if any}
-    code_p^,                           {CODE library use state}
-    mcomp_currline,                    {current global sequential source line number}
-    currlevel,                         {current nesting level}
-    adrreg_p^.sym_p^.comm_p);          {returned pointer to comments}
+  mcomp_pos_set (adrreg_p^.sym_p^.pos); {save source code position}
+  mcomp_comm_set (adrreg_p^.sym_p^.comm_p); {tag new symbol with curr comments}
 {
 *   Process the command options.
 }

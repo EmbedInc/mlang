@@ -61,6 +61,10 @@ procedure mcomp_comm_init (            {init comments system}
   in      coll: fline_coll_t);         {collection of lines that will be parsed}
   val_param; extern;
 
+procedure mcomp_comm_set (             {get pointer to comments for current line}
+  out     comm_p: code_comm_p_t);      {returned pointer to comments, may be NIL}
+  val_param; extern;
+
 function mcomp_currline                {get line number of current syntax tree position}
   :sys_int_machine_t;
   val_param; extern;
@@ -119,6 +123,10 @@ function mcomp_parse_statement (       {parse one statement at curr nesting leve
   :boolean;                            {statement parsed, syntax tree built}
   val_param; extern;
 
+procedure mcomp_pos_set (              {save current source code position}
+  out     pos: fline_cpos_t);          {position descriptor to write to}
+  val_param; extern;
+
 procedure mcomp_pre (                  {pre-process raw input into COLL_P^}
   in      fnam: univ string_var_arg_t; {top level source file to pre-process}
   out     stat: sys_err_t);            {completion status}
@@ -135,6 +143,11 @@ function mcomp_syn_stlevel (           {parse routine to find level of next stat
   val_param; extern;
 
 function mcomp_syn_type (              {parse routine for TYPE block substatement}
+  in out  syn: syn_t)
+  :boolean;
+  val_param; extern;
+
+function mcomp_syn_var (               {parse routine for VAR block substatement}
   in out  syn: syn_t)
   :boolean;
   val_param; extern;
@@ -173,4 +186,7 @@ procedure mcomp_syt_statement;         {interpret STATEMENT syntax}
   val_param; extern;
 
 procedure mcomp_syt_type_;             {process TYPE statement block}
+  val_param; extern;
+
+procedure mcomp_syt_var_;              {process VAR statement and its block}
   val_param; extern;

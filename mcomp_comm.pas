@@ -3,6 +3,7 @@
 module mcomp_comm;
 define mcomp_comm_init;
 define mcomp_comm_get;
+define mcomp_comm_set;
 %include 'mcomp.ins.pas';
 {
 *   Since there can be at most one comment per source line, each comment is
@@ -216,4 +217,23 @@ begin
         end
       ;
     end;                               {back for next input stream character}
+  end;
+{
+********************************************************************************
+*
+*   Subroutine MCOMP_COMM_SET (COMM_P)
+*
+*   Set COMM_P pointing to the comments for the current line.  COMM_P may be set
+*   to NIL, indicating that no comments apply to the current line.
+}
+procedure mcomp_comm_set (             {get pointer to comments for current line}
+  out     comm_p: code_comm_p_t);      {returned pointer to comments, may be NIL}
+  val_param;
+
+begin
+  code_comm_find (                     {get comments for a particular source line}
+    code_p^,                           {CODE library use state}
+    mcomp_currline,                    {current global sequential source line number}
+    currlevel,                         {current nesting level}
+    comm_p);                           {returned pointer to comments}
   end;

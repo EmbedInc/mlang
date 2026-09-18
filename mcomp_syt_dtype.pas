@@ -35,12 +35,8 @@ begin
     end;
   syn_trav_tag_string (syn_p^, name);  {get name of data type being defined}
   code_dtype_sym_new (code_p^, name, sym_p); {create new data type symbol}
-  syn_trav_tag_start (syn_p^, sym_p^.pos); {save source code position}
-  code_comm_find (                     {tag the new structure with comment, if any}
-    code_p^,                           {CODE library use state}
-    mcomp_currline,                    {current global sequential source line number}
-    currlevel,                         {current nesting level}
-    sym_p^.comm_p);                    {returned pointer to comments}
+  mcomp_pos_set (sym_p^.pos);          {save source code position}
+  mcomp_comm_set (sym_p^.comm_p);      {tag new symbol with current comments}
 {
 *   Process the data type syntax.
 }
@@ -51,11 +47,7 @@ begin
 
   mcomp_syt_dtype (dtype_p);           {get pointer to found or created data type}
   code_dtype_sym_set (code_p^, sym_p^, dtype_p^); {assign data type to symbol}
-  code_comm_find (                     {tag the new structure with comment, if any}
-    code_p^,                           {CODE library use state}
-    mcomp_currline,                    {current global sequential source line number}
-    currlevel,                         {current nesting level}
-    sym_p^.dtype_dtype_p^.comm_p);     {returned pointer to comments}
+  mcomp_comm_set (sym_p^.dtype_dtype_p^.comm_p); {tag new data type with curr comments}
 
   if not syn_trav_up (syn_p^) then begin {back up to parent syntax level}
     syn_msg_pos_bomb (syn_p^, '', 'type_bad', nil, 0);

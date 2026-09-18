@@ -100,7 +100,7 @@
     ("adrregion" space adrregion_[5]) .or
     ("set" space set_[6]) .or
     "type"[7] .or
-    ("var" var_[8]) .or
+    ("varblock" var_[8]) .or
     set_[6]
     )
   pad .eol

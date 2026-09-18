@@ -47,6 +47,9 @@ msg mem_name_none
 msg mem_opt_bad
   lan english -def
     Invalid MEMORY option.
+msg memreg_bad
+  lan english -def
+    "%p1s" is not a valid memory region.
 msg memreg_err
   lan english -def
     Error in MEMORY REGION statement.
@@ -55,7 +58,7 @@ msg memreg_name_none
     Unable to get memory region name.
 msg memreg_nfound
   lan english -def
-    Memory region not previously define.
+    Memory region not previously defined.
 msg memreg_opt_bad
   lan english -def
     Invalid MEMORY REGION option.
@@ -90,6 +93,7 @@ msg statement_subordinate
 msg syt_dtype_nil
   lan english -def
     INTERNAL ERROR: Returned data type pointer NIL in MCOMP_SYT_DTYPE.
+
 msg type_bad
   lan english -def
     Invalid TYPE statement.
@@ -108,3 +112,25 @@ msg type_sym_ndef
 msg type_sym_nfnd
   lan english -def
     No such data type as "%p1s".
+
+msg var_create
+  lan english -def
+    On attempt to create variable "%p1s".
+msg var_dtype_dup
+  lan english -def
+    Data type for variable "%p1s" already defined.
+msg var_memreg_dup
+  lan english -def
+    A memory region was previously set for the variable "%p1s".
+msg var_memreg_dup_block
+  lan english -def
+    Memory region "%1ps" was previously set for this VAR block.
+msg var_name_bad
+  lan english -def
+    Not a valid variable name.
+msg var_sment_bad
+  lan english -def
+    Invalid VAR statement.
+msg var_sment_sub_bad
+  lan english -def
+    Invalid VAR block sub-statement.
