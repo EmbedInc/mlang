@@ -146,10 +146,12 @@ begin
     writeln;
     end;
 
+(*
   if errsyn then begin                 {syntax error ?}
     syn_parse_err_show (syn_p^);       {show syntax error location}
     writeln;
     end;
+*)
 
   mcomp_parse_statement := true;       {indicate statement parsed, syntax tree built}
   end;

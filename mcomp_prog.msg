@@ -113,9 +113,9 @@ msg type_sym_nfnd
   lan english -def
     No such data type as "%p1s".
 
-msg var_create
+msg var_define
   lan english -def
-    On attempt to create variable "%p1s".
+    Error on attempt to define variable "%p1s".
 msg var_dtype_dup
   lan english -def
     Data type for variable "%p1s" already defined.
@@ -128,9 +128,10 @@ msg var_memreg_dup_block
 msg var_name_bad
   lan english -def
     Not a valid variable name.
-msg var_sment_bad
-  lan english -def
-    Invalid VAR statement.
 msg var_sment_sub_bad
   lan english -def
     Invalid VAR block sub-statement.
+
+msg varblock_bad
+  lan english -def
+    Error in VARBLOCK statement.

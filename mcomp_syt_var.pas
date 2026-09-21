@@ -43,6 +43,7 @@ begin
     syn_msg_tag_bomb (syn_p^, '', 'var_name_bad', nil, 0);
     end;
   syn_trav_tag_string (syn_p^, name);  {get name of variable being defined}
+
   code_var_new (                       {create the new variable and its symbol}
     code_p^,                           {CODE library use state}
     name,                              {variable name}
@@ -50,7 +51,7 @@ begin
     stat);
   if sys_error(stat) then begin
     sys_msg_parm_vstr (msg_parm[1], name);
-    syn_error_bomb (syn_p^, stat, '', 'var_create', msg_parm, 1);
+    syn_error_bomb (syn_p^, stat, '', 'var_define', msg_parm, 1);
     end;
 
   mcomp_comm_set (                     {save comments hierarchy for the variable}
@@ -88,18 +89,20 @@ begin
     sys_msg_parm_vstr (msg_parm[1], var_p^.sym_p^.name_p^);
     syn_msg_pos_bomb (syn_p^, '', 'var_memreg_dup', msg_parm, 1);
     end;
+  syn_trav_tag_string (syn_p^, name);  {get memory region name}
   code_memreg_find (                   {get pointer to the memory region}
     code_p^, name, var_p^.memreg_p, stat);
   if sys_error(stat) then begin
-    sys_msg_parm_vstr (msg_parm[1], name);
+    sys_msg_parm_vstr (msg_parm[1], var_p^.sym_p^.name_p^);
     syn_error_bomb (syn_p^,
-      stat, '', 'memreg_bad', msg_parm, 1);
+      stat, '', 'var_define', msg_parm, 1);
     end;
+  discard( syn_trav_next_tag (syn_p^) ); {skip over memregion QNAME tree entry}
   end;
 
 otherwise                              {unexpected tag}
       sys_msg_parm_vstr (msg_parm[1], var_p^.sym_p^.name_p^);
-      syn_msg_tag_bomb (syn_p^, '', 'var_create', msg_parm, 1);
+      syn_msg_tag_bomb (syn_p^, '', 'var_define', msg_parm, 1);
       end;
     end;                               {back for next tag this variable}
 
@@ -160,18 +163,17 @@ begin
         syn_trav_tag_string (syn_p^, name); {get memory region name}
         code_memreg_find (code_p^, name, varblk_p^.memreg_p, stat);
         if varblk_p^.memreg_p = nil then begin
-          sys_msg_parm_vstr (msg_parm[1], name);
-          syn_error_bomb (syn_p^, stat, '', 'memreg_bad', msg_parm, 1);
+          syn_error_bomb (syn_p^, stat, '', 'varblock_bad', nil, 0);
           end;
         end;
 
 otherwise                              {unexpected or error tag in VAR_ syntax}
-      syn_msg_pos_bomb (syn_p^, '', 'var_sment_bad', nil, 0);
+      syn_msg_pos_bomb (syn_p^, '', 'varblock_bad', nil, 0);
       end;
     end;                               {back for next tag in VAR_ syntax}
 
   if not syn_trav_up (syn_p^) then begin {back up to parent syntax level}
-    syn_msg_pos_bomb (syn_p^, '', 'var_sment_bad', nil, 0);
+    syn_msg_pos_bomb (syn_p^, '', 'varblock_bad', nil, 0);
     end;
 
   mcomp_parse_block (                  {parse the VAR substatements}

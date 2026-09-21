@@ -195,7 +195,9 @@ otherwise
       syn_msg_tag_bomb (syn_p^, '', 'qname_bad', nil, 0);
       end;
     end;                               {back for next name in hierarchy}
+
 done_tags:                             {done processing all QNAME tags}
+  discard( syn_trav_up (syn_p^) );     {back up from QNAME syntax}
 {
 *   The whole QNAME syntax has been scanned.  SYNAME is the final symbol in the
 *   qualified name hiearchy list.  When TYNAME is not empty, then it is the type
