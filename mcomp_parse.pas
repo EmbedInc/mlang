@@ -32,6 +32,7 @@ begin
     code_lib_def (inicfg);             {init CODE config parameters to default}
     inicfg.mem_p := mem_p;             {use our mem context as parent}
     inicfg.symlen_max := symlen_max;   {max length of other symbols}
+    inicfg.scope_new_app_p := addr(mcomp_scope_new_callback); {callback for new scope}
 
     code_lib_new (inicfg, code_p, stat); {start new use of the CODE library}
     sys_error_abort (stat, '', '', nil, 0);

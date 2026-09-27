@@ -80,6 +80,14 @@ msg qname_ent_nscope
     Component "%p1s" in qualified symbol type name does not have a
     subordinate scope, but is not last component.  All components of a
     qualified symbol name except the last must identify scopes.
+
+msg scope_nodat
+  lan english -def
+    INTERNAL ERROR: Current scope has no private app data.
+msg scope_none
+  lan english -def
+    INTERNAL ERROR: No current scope on call to MCOMP_SCOPEDAT.
+
 msg statement_bad
   lan english -def
     Invalid statement.

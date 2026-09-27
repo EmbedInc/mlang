@@ -36,6 +36,16 @@ type
   mcomp_treewalk_p_t = ^procedure;     {to subroutine to walk syntax tree}
     val_param;
 
+  mcomp_default_t = record             {defaults, kept per scope}
+    intbits: sys_int_machine_t;        {bit size of integer type}
+    memreg_p: code_memregion_p_t;      {memory region for static variables}
+    end;
+
+  mcomp_scopedat_p_t = ^mcomp_scopedat_t;
+  mcomp_scopedat_t = record            {our private data for each CODE lib scope}
+    default: mcomp_default_t;          {defaults to apply in this scope}
+    end;
+
 var (mcomp_com)
   mem_p: util_mem_context_p_t;         {mem context for this run of program}
   fline_p: fline_p_t;                  {to FLINE library use state}
@@ -79,6 +89,10 @@ procedure mcomp_err_atline (           {show error, source line, and bomb progra
   in      parms: univ sys_parm_msg_ar_t; {array of parameter descriptors}
   in      n_parms: sys_int_machine_t); {number of parameters in PARMS}
   options (val_param, extern, noreturn);
+
+procedure mcomp_global_scope_default ( {set to hard-coded initial defaults}
+  out     default: mcomp_default_t);   {per-scope default values}
+  val_param; extern;
 
 procedure mcomp_global_end;            {end MCOMP prog global state, release resources}
   val_param; extern;
@@ -130,6 +144,16 @@ procedure mcomp_pos_set (              {save current source code position}
 procedure mcomp_pre (                  {pre-process raw input into COLL_P^}
   in      fnam: univ string_var_arg_t; {top level source file to pre-process}
   out     stat: sys_err_t);            {completion status}
+  val_param; extern;
+
+procedure mcomp_scope_new_callback (   {called from CODE lib when new scope created}
+  in      code_p: code_p_t;            {to CODE library use state}
+  in      callback_p: univ_ptr;        {to private app callback data, unused}
+  in out  scope: code_scope_t);        {newly created scope}
+  val_param; extern;
+
+function mcomp_scopedat                {get pointer to private data for curr scope}
+  :mcomp_scopedat_p_t;                 {to our private data for curr scope, never NIL}
   val_param; extern;
 
 function mcomp_syn_statement (         {parse routine for top level statement}

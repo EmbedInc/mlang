@@ -92,6 +92,7 @@ var
   pos: syn_treepos_t;                  {scratch syntax tree traversing position}
   dt: code_dtype_t;                    {scratch internal data type descriptor}
   name: string_var80_t;                {scratch string}
+  scopedat_p: mcomp_scopedat_p_t;      {to our private data for the current scope}
   msg_parm:                            {references arguments passed to a message}
     array[1..max_msg_args] of sys_parm_msg_t;
 
@@ -105,6 +106,8 @@ begin
   if not syn_trav_next_down (syn_p^) then begin {down into DTYPE syntax}
     syn_msg_pos_bomb (syn_p^, '', 'type_def_bad', nil, 0);
     end;
+
+  scopedat_p := mcomp_scopedat;        {get our private data for the curr scope}
 
   tag := syn_trav_next_tag (syn_p^);   {get tag for top level data type}
   case tag of                          {which top level data type is it ?}
@@ -137,7 +140,7 @@ begin
 2: begin
   code_dtype_init (dt);                {init temp data type descriptor}
   dt.typ := code_typid_int_k;          {set to INT data type}
-  dt.bits_min := code_p^.default.int_bits; {init number of bits to default}
+  dt.bits_min := scopedat_p^.default.intbits; {init number of bits to default}
   dt.int_sign := false;                {init to unsigned}
   dt.int_exactbits := false;           {init to not exactly BITS_MIN bits}
 

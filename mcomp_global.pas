@@ -3,6 +3,7 @@
 module mcomp_global;
 define mcomp_global_init;
 define mcomp_global_end;
+define mcomp_global_scope_default;
 %include 'mcomp.ins.pas';
 {
 ********************************************************************************
@@ -57,4 +58,22 @@ begin
   if mem_p <> nil then begin
     util_mem_context_del (mem_p);
     end;
+  end;
+{
+********************************************************************************
+*
+*   Subroutine MCOMP_GLOBAL_SCOPE_DEFAULT (DEFAULT)
+*
+*   Initialize the per-scope defaults to the original hard-coded values.  These
+*   defaults can be later set per scope, and are inherited as new subordinate
+*   scopes are created.  This routine sets the defaults to the original values
+*   before any source code is processed.
+}
+procedure mcomp_global_scope_default ( {set to hard-coded initial defaults}
+  out     default: mcomp_default_t);   {per-scope default values}
+  val_param;
+
+begin
+  default.intbits := 8;                {unspecified integer size, bits}
+  default.memreg_p := nil;             {no default mem region for variables}
   end;
