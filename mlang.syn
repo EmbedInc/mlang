@@ -27,6 +27,7 @@
 /*
 .symbol type_sub[mcomp_syn_type]       /* substatement in TYPE block
 .symbol varblock_sub[mcomp_syn_var]    /* substatement in VARBLOCK block
+.symbol default_sub[mcomp_syn_default] /* substatement in DEFAULT block
 
 /*******************************************************************************
 /*
@@ -101,6 +102,7 @@
     ("set" space set_[6]) .or
     "type"[7] .or
     ("varblock" varblock_[8]) .or
+    "default"[9] .or
     set_[6]
     )
   pad .eol
@@ -159,6 +161,13 @@
 /*
 /*   Substatements within specific blocks.
 /*
+.define default_sub .as
+  (
+    ("intbits" space integer[1]) .or
+    ("in" space qname[2])
+    )
+  pad .eol
+
 .define type_sub .as
   name[1] space dtype[1] pad .eol
 

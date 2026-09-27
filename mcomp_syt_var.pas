@@ -25,6 +25,7 @@ var
   tag: sys_int_machine_t;              {tagged syntax ID}
   name: mcomp_name_t;                  {scratch symbol name string}
   var_p: code_var_p_t;                 {to new variable descriptor}
+  scopedat_p: mcomp_scopedat_p_t;      {to our data for the current scope}
   msg_parm:                            {references arguments passed to a message}
     array[1..max_msg_args] of sys_parm_msg_t;
   stat: sys_err_t;                     {completion status}
@@ -105,6 +106,12 @@ otherwise                              {unexpected tag}
       syn_msg_tag_bomb (syn_p^, '', 'var_define', msg_parm, 1);
       end;
     end;                               {back for next tag this variable}
+
+  if var_p^.memreg_p = nil then begin  {no memory region defined ?}
+    scopedat_p := mcomp_scopedat;      {get pnt to our data for curr scope}
+    var_p^.memreg_p :=                 {use default memory region, if any}
+      scopedat_p^.default.memreg_p;
+    end;
 
   if not syn_trav_up (syn_p^) then begin {back up to parent syntax level}
     syn_msg_pos_bomb (syn_p^, '', 'var_sment_sub_bad', nil, 0);

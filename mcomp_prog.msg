@@ -28,6 +28,14 @@ msg adr_name_none
 msg adr_opt_bad
   lan english -def
     Invalid adrspace option.
+
+msg default_bad
+  lan english -def
+    Invalid DEFAULT statement.
+msg default_in_err
+  lan english -def
+    Error in IN statement within DEFAULT block.
+
 msg end_len_diff
   lan english -def
     Mismatch between address length and end address.

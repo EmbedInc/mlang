@@ -156,6 +156,11 @@ function mcomp_scopedat                {get pointer to private data for curr sco
   :mcomp_scopedat_p_t;                 {to our private data for curr scope, never NIL}
   val_param; extern;
 
+function mcomp_syn_default (           {parse routine for DEFAULT block substatement}
+  in out  syn: syn_t)
+  :boolean;
+  val_param; extern;
+
 function mcomp_syn_statement (         {parse routine for top level statement}
   in out  syn: syn_t)
   :boolean;
@@ -179,6 +184,9 @@ function mcomp_syn_var (               {parse routine for VAR block substatement
 procedure mcomp_syt_accesstype (       {interpret ACCESSTYPE syntax}
   in out  accs: code_memaccs_t;        {access list to update}
   in      parent: code_memaccs_t);     {parent code accsibutes}
+  val_param; extern;
+
+procedure mcomp_syt_default_;          {process DEFAULT statement block}
   val_param; extern;
 
 procedure mcomp_syt_dtype (            {process DTYPE syntax}
