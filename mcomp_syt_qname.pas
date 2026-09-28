@@ -35,7 +35,7 @@ begin
   syt_qnent := true;                   {init to returning with symbol name}
 
   if not syn_trav_next_down (syn_p^) then begin {down into QNENT syntax}
-    syn_msg_pos_bomb (syn_p^, '', 'qname_ent_bad', nil, 0);
+    mcomp_err_atline ('', 'qname_ent_bad', nil, 0);
     end;
 
   while true do begin                  {process each of the QNENT tags}
@@ -57,7 +57,7 @@ otherwise
     end;                               {back to get next tag}
 done_tags:                             {done processing all the QNENT tags}
 
-  discard( syn_trav_up (syn_p^) );     {back up to parent level}
+  mcomp_trav_up;                       {back up to parent level}
   end;
 {
 ********************************************************************************
@@ -104,10 +104,10 @@ begin
     if tyname.len > 0
       then begin                       {have specific type}
         sys_msg_parm_vstr (msg_parm[2], tyname);
-        syn_msg_pos_bomb (syn_p^, '', 'qname_ent_nfnd_ty', msg_parm, 2);
+        mcomp_err_atline ('', 'qname_ent_nfnd_ty', msg_parm, 2);
         end
       else begin                       {no specific type}
-        syn_msg_pos_bomb (syn_p^, '', 'qname_ent_nfnd', msg_parm, 1);
+        mcomp_err_atline ('', 'qname_ent_nfnd', msg_parm, 1);
         end
       ;
     end;
@@ -116,7 +116,7 @@ begin
 }
   if sym_p^.subscope_p = nil then begin {no subordinate scope ?}
     sys_msg_parm_vstr (msg_parm[1], syname);
-    syn_msg_pos_bomb (syn_p^, '', 'qname_ent_nscope', msg_parm, 1);
+    mcomp_err_atline ('', 'qname_ent_nscope', msg_parm, 1);
     end;
 
   scope_p := sym_p^.subscope_p;        {go to the subscope of this symbol}
@@ -157,7 +157,7 @@ begin
   tyname.max := size_char(tyname.str);
 
   if not syn_trav_next_down (syn_p^) then begin {down into QNAME syntax}
-    syn_msg_pos_bomb (syn_p^, '', 'qname_bad', nil, 0);
+    mcomp_err_atline ('', 'qname_bad', nil, 0);
     end;
 
   scope_p := code_p^.scope_p;          {init current scope}
@@ -197,7 +197,7 @@ otherwise
     end;                               {back for next name in hierarchy}
 
 done_tags:                             {done processing all QNAME tags}
-  discard( syn_trav_up (syn_p^) );     {back up from QNAME syntax}
+  mcomp_trav_up;                       {back up to parent level}
 {
 *   The whole QNAME syntax has been scanned.  SYNAME is the final symbol in the
 *   qualified name hiearchy list.  When TYNAME is not empty, then it is the type

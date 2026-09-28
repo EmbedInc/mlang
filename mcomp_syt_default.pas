@@ -50,15 +50,11 @@ begin
 *   Unexpected substatement ID tag.
 }
 otherwise
-    syn_msg_pos_bomb (syn_p^, '', 'default_bad', nil, 0);
+    syn_msg_tag_bomb (syn_p^, '', 'default_bad', nil, 0);
     end;                               {end of DEFAULT substatement cases}
 
-  if syn_trav_next_tag(syn_p^) <> syn_tag_end_k then begin
-    syn_msg_tag_bomb (syn_p^, '', 'default_bad', nil, 0);
-    end;
-
-  if not syn_trav_up (syn_p^) then begin {back up to parent syntax level}
-    syn_msg_pos_bomb (syn_p^, '', 'default_bad', nil, 0);
+  if not mcomp_trav_next_end_up then begin
+    sys_message_bomb ('', 'default_bad', nil, 0);
     end;
   end;
 {

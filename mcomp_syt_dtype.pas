@@ -24,7 +24,7 @@ begin
   name.max := size_char(name.str);     {init local var string}
 
   if not syn_trav_next_down (syn_p^) then begin {down into TYPE_SUB syntax}
-    syn_msg_pos_bomb (syn_p^, '', 'type_bad', nil, 0);
+    mcomp_err_atline ('', 'type_bad', nil, 0);
     end;
 {
 *   Create the new data type symbol.
@@ -33,7 +33,7 @@ begin
   if tag <> 1 then begin
     syn_msg_tag_bomb (syn_p^, '', 'type_name_bad', nil, 0);
     end;
-  syn_trav_tag_string (syn_p^, name);  {get name of data type being defined}
+  mcomp_syt_name (name);               {get name of data type being defined}
   code_dtype_sym_new (code_p^, name, sym_p); {create new data type symbol}
   mcomp_pos_set (sym_p^.pos);          {save source code position}
   mcomp_comm_set (sym_p^.comm_p);      {tag new symbol with current comments}
@@ -49,8 +49,8 @@ begin
   code_dtype_sym_set (code_p^, sym_p^, dtype_p^); {assign data type to symbol}
   mcomp_comm_set (sym_p^.dtype_dtype_p^.comm_p); {tag new data type with curr comments}
 
-  if not syn_trav_up (syn_p^) then begin {back up to parent syntax level}
-    syn_msg_pos_bomb (syn_p^, '', 'type_bad', nil, 0);
+  if not mcomp_trav_end_up then begin  {back up to parent syntax level}
+    sys_message_bomb ('', 'type_bad', nil, 0);
     end;
   end;
 {
@@ -104,7 +104,7 @@ begin
   dtype_p := nil;                      {init to return pointer not set yet}
 
   if not syn_trav_next_down (syn_p^) then begin {down into DTYPE syntax}
-    syn_msg_pos_bomb (syn_p^, '', 'type_def_bad', nil, 0);
+    mcomp_err_atline ('', 'type_def_bad', nil, 0);
     end;
 
   scopedat_p := mcomp_scopedat;        {get our private data for the curr scope}
@@ -179,7 +179,7 @@ otherwise
     syn_msg_pos_bomb (syn_p^, '', 'syt_dtype_nil', nil, 0);
     end;
 
-  if not syn_trav_up (syn_p^) then begin {back up to parent syntax level}
-    syn_msg_pos_bomb (syn_p^, '', 'type_def_bad', nil, 0);
+  if not mcomp_trav_next_end_up then begin {back up to parent syntax level}
+    sys_message_bomb ('', 'type_def_bad', nil, 0);
     end;
   end;

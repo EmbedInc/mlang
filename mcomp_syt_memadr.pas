@@ -30,7 +30,7 @@ begin
   name.max := size_char(name.str);     {init local var string}
 
   if not syn_trav_next_down (syn_p^) then begin {down into MEMORY_ syntax}
-    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'mem_err', nil, 0);
+    mcomp_err_atline ('mcomp_prog', 'mem_err', nil, 0);
     end;
 {
 *   Create and initialize the memory descriptor.
@@ -76,10 +76,10 @@ otherwise                              {unexpected tag}
 
 done_syn:                              {done interpreting syntax}
   if mem_p^.accs = [] then begin       {no access to this memory ?}
-    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'access_none', nil, 0);
+    mcomp_err_atline ('mcomp_prog', 'access_none', nil, 0);
     end;
 
-  discard( syn_trav_up (syn_p^) );     {back up to parent level}
+  mcomp_trav_up;                       {back up to parent level}
   end;
 {
 ********************************************************************************
@@ -110,7 +110,7 @@ begin
   memname.max := size_char(memname.str);
 
   if not syn_trav_next_down (syn_p^) then begin {down into MEMORY_ syntax}
-    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'memreg_err', nil, 0);
+    mcomp_err_atline ('mcomp_prog', 'memreg_err', nil, 0);
     end;
 {
 *   Create and initialize the memory region descriptor.
@@ -180,11 +180,11 @@ otherwise                              {unexpected tag}
 
 done_syn:                              {done interpreting syntax}
   if (not len_set) and (not end_set) then begin {end not specified either way ?}
-    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'end_len_none', nil, 0);
+    mcomp_err_atline ('mcomp_prog', 'end_len_none', nil, 0);
     end;
   if len_set and end_set then begin    {both length and end specified}
     if len <> (memreg_p^.adren - memreg_p^.adrst + 1) then begin {specs conflict ?}
-      syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'end_len_diff', nil, 0);
+      mcomp_err_atline ('mcomp_prog', 'end_len_diff', nil, 0);
       end;
     end;
   if not end_set then begin            {length specified but not end address ?}
@@ -195,10 +195,10 @@ done_syn:                              {done interpreting syntax}
     memreg_p^.accs := memreg_p^.mem_p^.accs; {default to parent's access}
     end;
   if memreg_p^.accs = [] then begin    {no access to this memory region ?}
-    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'access_none', nil, 0);
+    mcomp_err_atline ('mcomp_prog', 'access_none', nil, 0);
     end;
 
-  discard( syn_trav_up (syn_p^) );     {back up to parent level}
+  mcomp_trav_up;                       {back up to parent level}
   end;
 {
 ********************************************************************************
@@ -223,7 +223,7 @@ begin
   name.max := size_char(name.str);     {init local var string}
 
   if not syn_trav_next_down (syn_p^) then begin {down into ADRSPACE_ syntax}
-    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'adr_err', nil, 0);
+    mcomp_err_atline ('mcomp_prog', 'adr_err', nil, 0);
     end;
 {
 *   Create and initialize the memory descriptor.
@@ -269,10 +269,10 @@ otherwise                              {unexpected tag}
 
 done_syn:                              {done interpreting syntax}
   if adr_p^.accs = [] then begin       {no access to this address space ?}
-    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'access_none', nil, 0);
+    mcomp_err_atline ('mcomp_prog', 'access_none', nil, 0);
     end;
 
-  discard( syn_trav_up (syn_p^) );     {back up to parent level}
+  mcomp_trav_up;                       {back up to parent level}
   end;
 {
 ********************************************************************************
@@ -304,7 +304,7 @@ begin
   adrname.max := size_char(adrname.str);
 
   if not syn_trav_next_down (syn_p^) then begin {down into ADRREGION_ syntax}
-    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'adrreg_err', nil, 0);
+    mcomp_err_atline ('mcomp_prog', 'adrreg_err', nil, 0);
     end;
 {
 *   Create and initialize the address region descriptor.
@@ -384,11 +384,11 @@ otherwise                              {unexpected tag}
 
 done_syn:                              {done interpreting syntax}
   if (not len_set) and (not end_set) then begin {end not specified either way ?}
-    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'end_len_none', nil, 0);
+    mcomp_err_atline ('mcomp_prog', 'end_len_none', nil, 0);
     end;
   if len_set and end_set then begin    {both length and end specified ?}
     if len <> (adrreg_p^.adren - adrreg_p^.adrst + 1) then begin {specs conflict ?}
-      syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'end_len_diff', nil, 0);
+      mcomp_err_atline ('mcomp_prog', 'end_len_diff', nil, 0);
       end;
     end;
   if not end_set then begin            {length specified but not end address ?}
@@ -399,8 +399,8 @@ done_syn:                              {done interpreting syntax}
     adrreg_p^.accs := adrreg_p^.space_p^.accs; {default to parent's access}
     end;
   if adrreg_p^.accs = [] then begin    {no access to this address region ?}
-    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'access_none', nil, 0);
+    mcomp_err_atline ('mcomp_prog', 'access_none', nil, 0);
     end;
 
-  discard( syn_trav_up (syn_p^) );     {back up to parent level}
+  mcomp_trav_up;                       {back up to parent level}
   end;

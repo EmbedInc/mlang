@@ -93,7 +93,7 @@ var
 
 begin
   if not syn_trav_next_down (syn_p^) then begin {down into ACCESSTYPE syntax}
-    syn_msg_pos_bomb (syn_p^, 'mcomp_prog', 'accty_err', nil, 0);
+    mcomp_err_atline ('mcomp_prog', 'accty_err', nil, 0);
     end;
 
   accs := [];                          {init to no access}
@@ -102,7 +102,7 @@ begin
     tag := syn_trav_next_tag (syn_p^); {get tag for optional preceeding "-"}
     case tag of
 syn_tag_end_k: begin                   {end of options}
-        discard( syn_trav_up (syn_p^) ); {back up to parent level}
+        mcomp_trav_up;                 {back up to parent level}
         return;
         end;
 1:    remove := false;
@@ -165,7 +165,7 @@ var
 
 begin
   if not syn_trav_next_down (syn_p^) then begin {down into STATEMENT}
-    syn_msg_pos_bomb (syn_p^, '', '', nil, 0);
+    mcomp_err_atline ('', '', nil, 0);
     end;
 
   tag := syn_trav_next_tag(syn_p^);    {get first mandatory tag}
@@ -200,7 +200,7 @@ otherwise                              {unexpected tag}
     syn_msg_tag_bomb (syn_p^, 'mcomp_prog', 'statement_bad', nil, 0);
     end;
 
-  discard( syn_trav_up (syn_p^) );     {back up to parent level}
+  mcomp_trav_up;                       {back up to parent level}
   end;
 {
 ********************************************************************************

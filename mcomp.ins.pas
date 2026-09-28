@@ -230,3 +230,14 @@ procedure mcomp_syt_type_;             {process TYPE statement block}
 
 procedure mcomp_syt_var_;              {process VAR statement and its block}
   val_param; extern;
+
+function mcomp_trav_next_end_up        {up to parent syntax, next tag must be end}
+  :boolean;                            {success, no error message written}
+  val_param; extern;
+
+procedure mcomp_trav_up;               {to parent level}
+  val_param; extern;
+
+function mcomp_trav_end_up             {up to parent syntax, curr tag must be end}
+  :boolean;                            {success, no error message written}
+  val_param; extern;

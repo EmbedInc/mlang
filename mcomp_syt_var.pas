@@ -34,7 +34,7 @@ begin
   name.max := size_char(name.str);     {init local var string}
 
   if not syn_trav_next_down (syn_p^) then begin {down into VAR_SUB syntax}
-    syn_msg_pos_bomb (syn_p^, '', 'var_sment_sub_bad', nil, 0);
+    mcomp_err_atline ('', 'var_sment_sub_bad', nil, 0);
     end;
 {
 *   Get the variable name and create the variable symbol.
@@ -109,9 +109,7 @@ otherwise                              {unexpected tag}
       scopedat_p^.default.memreg_p;
     end;
 
-  if not syn_trav_up (syn_p^) then begin {back up to parent syntax level}
-    syn_msg_pos_bomb (syn_p^, '', 'var_sment_sub_bad', nil, 0);
-    end;
+  mcomp_trav_up;                       {back up to parent syntax level}
   end;
 {
 ********************************************************************************
@@ -174,9 +172,7 @@ otherwise                              {unexpected or error tag in VAR_ syntax}
       end;
     end;                               {back for next tag in VAR_ syntax}
 
-  if not syn_trav_up (syn_p^) then begin {back up to parent syntax level}
-    syn_msg_pos_bomb (syn_p^, '', 'varblock_bad', nil, 0);
-    end;
+  mcomp_trav_up;                       {back up to parent syntax level}
 
   mcomp_parse_block (                  {parse the VAR substatements}
     addr(mcomp_syn_var),               {parse routine for each substatement}
