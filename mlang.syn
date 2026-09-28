@@ -164,7 +164,7 @@
 .define default_sub .as
   (
     ("intbits" space integer[1]) .or
-    ("in" space qname[2])
+    ("in" space name[2])
     )
   pad .eol
 
@@ -176,6 +176,6 @@
   .occurs[0 to inf] (
     space
     ("type" space dtype[1]) .or
-    ("in" space qname[2])
+    ("in" space name[2])
     )
   pad .eol

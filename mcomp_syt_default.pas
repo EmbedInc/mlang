@@ -17,7 +17,6 @@ var
   tag: sys_int_machine_t;              {tagged syntax ID}
   scopedat_p: mcomp_scopedat_p_t;      {to our data for the current scope}
   name: mcomp_name_t;                  {name of data type being defined}
-  stat: sys_err_t;                     {completion status}
 
 begin
   name.max := size_char(name.str);     {init local var string}
@@ -41,13 +40,11 @@ begin
 }
 2: begin
   scopedat_p := mcomp_scopedat;        {get pnt to our data for curr scope}
-  syn_trav_tag_string (syn_p^, name);  {get memory region name}
-  code_memreg_find (                   {get pointer to the memory region}
-    code_p^, name, scopedat_p^.default.memreg_p, stat);
-  if sys_error(stat) then begin
-    syn_error_bomb (syn_p^, stat, '', 'default_in_err', nil, 0);
+  mcomp_syt_name_memreg (              {process NAME syntax to get memory region}
+    scopedat_p^.default.memreg_p);     {returned pointer to memory region or NIL}
+  if scopedat_p^.default.memreg_p = nil then begin {no such memory region ?}
+    mcomp_err_atline ('', 'default_in_err', nil, 0);
     end;
-  discard( syn_trav_next_tag (syn_p^) ); {skip over memregion QNAME tree entry}
   end;
 {
 *   Unexpected substatement ID tag.

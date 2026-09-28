@@ -209,6 +209,14 @@ procedure mcomp_syt_memory_;           {interpret MEMORY_ syntax}
 procedure mcomp_syt_memregion_;        {interpret MEMREGION_ syntax}
   val_param; extern;
 
+procedure mcomp_syt_name (             {process NAME syntax}
+  in out  name: univ string_var_arg_t); {returned name}
+  val_param; extern;
+
+procedure mcomp_syt_name_memreg (      {process NAME syntax to get memory region}
+  out     memreg_p: code_memregion_p_t); {to mem region, err msg and NIL on not found}
+  val_param; extern;
+
 procedure mcomp_syt_qname (            {interpret QNAME syntax}
   in      symtypes: code_symtype_t;    {allowable symbol types}
   out     sym_p: code_symbol_p_t);     {to symbol, or NIL for not found}

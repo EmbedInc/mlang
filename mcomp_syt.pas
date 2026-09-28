@@ -21,6 +21,8 @@ define mcomp_currline;
 define mcomp_syt_integer;
 define mcomp_syt_accesstype;
 define mcomp_syt_statement;
+define mcomp_syt_name;
+define mcomp_syt_name_memreg;
 %include 'mcomp.ins.pas';
 {
 ********************************************************************************
@@ -199,4 +201,52 @@ otherwise                              {unexpected tag}
     end;
 
   discard( syn_trav_up (syn_p^) );     {back up to parent level}
+  end;
+{
+********************************************************************************
+*
+*   Subroutine MCOMP_SYT_NAME (NAME)
+*
+*   Process the NAME syntax and return the indicated name string.  The current
+*   syntax tree position must be at a tag for the NAME syntax.  This syntax has
+*   no subordinate level, so the syntax tree position is left unchanged.
+}
+procedure mcomp_syt_name (             {process NAME syntax}
+  in out  name: univ string_var_arg_t); {returned name}
+  val_param;
+
+begin
+  syn_trav_tag_string (syn_p^, name);
+  end;
+{
+********************************************************************************
+*
+*   Subroutine MCOMP_SYT_NAME_MEMREG (MEMREG_P)
+*
+*   Process the NAME syntax as the name of a memory region.  The pointer to the
+*   memory region is returned.  The current syntax tree position must be at a
+*   tag for the NAME syntax.  This syntax has no subordinate level, so the
+*   syntax tree position is left unchanged.
+*
+*   When no memory region matching the name is found, an error message is
+*   emitted and MEMREG_P is returned NIL.
+}
+procedure mcomp_syt_name_memreg (      {process NAME syntax to get memory region}
+  out     memreg_p: code_memregion_p_t); {to mem region, err msg and NIL on not found}
+  val_param;
+
+var
+  name: mcomp_name_t;                  {symbol name string}
+  stat: sys_err_t;                     {completion status}
+
+begin
+  name.max := size_char(name.str);     {init local var string}
+
+  mcomp_syt_name (name);               {get the name string}
+  code_memreg_find (                   {find the memory region}
+    code_p^,                           {CODE library use state}
+    name,                              {name of memory region to find}
+    memreg_p,                          {returned pointer to the mem region}
+    stat);
+  sys_error_print (stat, '', '', nil, 0);
   end;

@@ -43,7 +43,7 @@ begin
   if tag <> 1 then begin
     syn_msg_tag_bomb (syn_p^, '', 'var_name_bad', nil, 0);
     end;
-  syn_trav_tag_string (syn_p^, name);  {get name of variable being defined}
+  mcomp_syt_name (name);               {get name of variable being defined}
 
   code_var_new (                       {create the new variable and its symbol}
     code_p^,                           {CODE library use state}
@@ -90,15 +90,11 @@ begin
     sys_msg_parm_vstr (msg_parm[1], var_p^.sym_p^.name_p^);
     syn_msg_pos_bomb (syn_p^, '', 'var_memreg_dup', msg_parm, 1);
     end;
-  syn_trav_tag_string (syn_p^, name);  {get memory region name}
-  code_memreg_find (                   {get pointer to the memory region}
-    code_p^, name, var_p^.memreg_p, stat);
-  if sys_error(stat) then begin
+  mcomp_syt_name_memreg (var_p^.memreg_p); {get pointer to mem region}
+  if var_p^.memreg_p = nil then begin  {no such memory region ?}
     sys_msg_parm_vstr (msg_parm[1], var_p^.sym_p^.name_p^);
-    syn_error_bomb (syn_p^,
-      stat, '', 'var_define', msg_parm, 1);
+    mcomp_err_atline ('', 'var_define', msg_parm, 1);
     end;
-  discard( syn_trav_next_tag (syn_p^) ); {skip over memregion QNAME tree entry}
   end;
 
 otherwise                              {unexpected tag}
@@ -167,10 +163,9 @@ begin
           sys_msg_parm_vstr (msg_parm[1], varblk_p^.memreg_p^.sym_p^.name_p^);
           syn_error_bomb (syn_p^, stat, '', 'var_memreg_dup_block', msg_parm, 1);
           end;
-        syn_trav_tag_string (syn_p^, name); {get memory region name}
-        code_memreg_find (code_p^, name, varblk_p^.memreg_p, stat);
-        if varblk_p^.memreg_p = nil then begin
-          syn_error_bomb (syn_p^, stat, '', 'varblock_bad', nil, 0);
+        mcomp_syt_name_memreg (varblk_p^.memreg_p); {get pnt to mem region}
+        if varblk_p^.memreg_p = nil then begin {no such memory region ?}
+          mcomp_err_atline ('', 'varblock_bad', nil, 0);
           end;
         end;
 
