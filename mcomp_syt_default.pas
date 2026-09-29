@@ -36,13 +36,24 @@ begin
     mcomp_syt_integer;
   end;
 {
-*   IN memregion
+*   VARS IN memregion
 }
 2: begin
   scopedat_p := mcomp_scopedat;        {get pnt to our data for curr scope}
   mcomp_syt_name_memreg (              {process NAME syntax to get memory region}
-    scopedat_p^.default.memreg_p);     {returned pointer to memory region or NIL}
-  if scopedat_p^.default.memreg_p = nil then begin {no such memory region ?}
+    scopedat_p^.default.var_mreg_p);   {returned pointer to memory region or NIL}
+  if scopedat_p^.default.var_mreg_p = nil then begin {no such memory region ?}
+    mcomp_err_atline ('', 'default_in_err', nil, 0);
+    end;
+  end;
+{
+*   CODE IN memregion
+}
+3: begin
+  scopedat_p := mcomp_scopedat;        {get pnt to our data for curr scope}
+  mcomp_syt_name_memreg (              {process NAME syntax to get memory region}
+    scopedat_p^.default.code_mreg_p);  {returned pointer to memory region or NIL}
+  if scopedat_p^.default.code_mreg_p = nil then begin {no such memory region ?}
     mcomp_err_atline ('', 'default_in_err', nil, 0);
     end;
   end;

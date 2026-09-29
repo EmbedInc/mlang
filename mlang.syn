@@ -164,7 +164,8 @@
 .define default_sub .as
   (
     ("intbits" space integer[1]) .or
-    ("in" space name[2])
+    ("vars" space "in" space name[2]) .or
+    ("code" space "in" space name[3])
     )
   pad .eol
 

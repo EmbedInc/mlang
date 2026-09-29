@@ -106,7 +106,7 @@ otherwise                              {unexpected tag}
   if var_p^.memreg_p = nil then begin  {no memory region defined ?}
     scopedat_p := mcomp_scopedat;      {get pnt to our data for curr scope}
     var_p^.memreg_p :=                 {use default memory region, if any}
-      scopedat_p^.default.memreg_p;
+      scopedat_p^.default.var_mreg_p;
     end;
 
   mcomp_trav_up;                       {back up to parent syntax level}

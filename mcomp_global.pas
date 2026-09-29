@@ -75,5 +75,6 @@ procedure mcomp_global_scope_default ( {set to hard-coded initial defaults}
 
 begin
   default.intbits := 8;                {unspecified integer size, bits}
-  default.memreg_p := nil;             {no default mem region for variables}
+  default.var_mreg_p := nil;           {no default mem region for variables}
+  default.code_mreg_p := nil;          {no default mem region for executable code}
   end;

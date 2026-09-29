@@ -38,7 +38,8 @@ type
 
   mcomp_default_t = record             {defaults, kept per scope}
     intbits: sys_int_machine_t;        {bit size of integer type}
-    memreg_p: code_memregion_p_t;      {memory region for static variables}
+    var_mreg_p: code_memregion_p_t;    {memory region for static variables}
+    code_mreg_p: code_memregion_p_t;   {memory retion for executable code}
     end;
 
   mcomp_scopedat_p_t = ^mcomp_scopedat_t;
